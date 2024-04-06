@@ -30,7 +30,7 @@
 				</tr>
 				<tr>
 				<!-- 2 options: either signup -> account.jsp page OR signup -> signup.jsp page -->
-					<td><input type = "submit" formaction = "account.jsp" name = "signin" value = "SignIn"></td>
+					<td><input type = "submit" formaction = "checkLoginDetails.jsp" name = "signin" value = "SignIn"></td>
 					<td><input type = "submit" formaction = "signup.jsp" name = "signup" value = "SignUp"></td>
 				</tr>
 			</table>

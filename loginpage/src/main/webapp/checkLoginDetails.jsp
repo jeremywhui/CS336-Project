@@ -31,22 +31,26 @@
 			if (username != null && !username.isEmpty() && password != null && !password.isEmpty()){
 				if (result.next()){ // Checks if rows are found
 					// stores username in session
-					HttpSession newSession = request.getSession();
-					newSession.setAttribute("username", username);
+					session.setAttribute("username", username);
 					username = result.getString("username");
 				%>
 				<!-- successful login shows welcome username -->
 					<p> Welcome <%= username %> </p>
 					<!-- logout button -->
-					<form method = "post" action = "login.jsp">
+					<form method = "post" action = "logout.jsp">
 						<input type = "submit" value = "Logout">
 					</form>
+					<%
+					out.println("<a href='logout.jsp'>Log out</a>");
+					response.sendRedirect("index.jsp");
+					%>
+					
 				<%
 				}
 				else{
 				%>
 				<!-- unsuccessful login shows error AND signup button option -> signup.jsp page -->
-					<p> Incorrect username or password </p>
+					<p> Incorrect username or password. Try again or create a new account here: </p>
 					<br>
 					<form method="post" action="signup.jsp">
 						<input type="submit" value="SignUp Page">
