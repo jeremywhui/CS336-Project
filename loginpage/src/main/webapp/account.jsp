@@ -30,10 +30,17 @@
 			// Check if username, and password are not empty
 			if (username != null && !username.isEmpty() && password != null && !password.isEmpty()){
 				if (result.next()){ // Checks if rows are found
+					// stores username in session
+					HttpSession newSession = request.getSession();
+					newSession.setAttribute("username", username);
 					username = result.getString("username");
 				%>
 				<!-- successful login shows welcome username -->
 					<p> Welcome <%= username %> </p>
+					<!-- logout button -->
+					<form method = "post" action = "login.jsp">
+						<input type = "submit" value = "Logout">
+					</form>
 				<%
 				}
 				else{
