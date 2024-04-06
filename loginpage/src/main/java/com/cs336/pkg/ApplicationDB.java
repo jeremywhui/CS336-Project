@@ -55,7 +55,6 @@ public class ApplicationDB {
 	
 	
 	public static void main(String[] args) {
-		// Testing comments!
 		ApplicationDB dao = new ApplicationDB();
 		Connection connection = dao.getConnection();
 		
