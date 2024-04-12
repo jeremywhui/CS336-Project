@@ -10,3 +10,9 @@ CREATE TABLE IF NOT EXISTS End_User(
     isBuyer BOOLEAN, 
     PRIMARY KEY (user_id)
 );
+
+ALTER TABLE End_User
+ADD UNIQUE INDEX(username);
+
+INSERT IGNORE INTO End_User(username, password, email, isSeller, isBuyer)
+VALUES ('test', 'test', 'test@test.com', false, false);
