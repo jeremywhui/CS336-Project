@@ -51,8 +51,7 @@
                 out.println("<p style='color:red;'>User with this username already exists. Try another username.</p>");
             }
             else if (AuthenticationUtil.registerNewUser(email, username, password)){ // Registers user in database
-                session.setAttribute("isRegistered", true);
-                response.sendRedirect("login.jsp"); // Redirects to login page with a success message
+                response.sendRedirect("login.jsp"); // Redirects to login page
             }
             else{
                 out.println("<p style='color:red;'>Something went wrong.</p>");

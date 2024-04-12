@@ -16,29 +16,21 @@
 			if(session.getAttribute("username") != null){ // If user is already logged in, redirect to index.jsp
 				response.sendRedirect("index.jsp");
 			}
-			if(Boolean.TRUE.equals(session.getAttribute("isRegistered"))){ // If user has successfully registered, display success message
-				out.println("<p style='color:green;'>You have successfully registered. Please login.</p>");
-				session.removeAttribute("isRegistered");
-			}
 		%>
-
 
 		<h1> Login Page </h1>
 		<p> Please enter your username and password to login.</p>		  
 		<form method="post">
 			<table>
 				<tr>
-				<!-- input text field labeled username -->
 					<td> Username: </td>
 					<td><input type = "text" name = "username"></td>
 				</tr>
 				<tr>
-				<!-- input password field labeled password -->
 					<td> Password: </td>
 					<td><input type = "password" name = "password"></td>
 				</tr>
 				<tr>
-				<!-- 2 options: either signup -> account.jsp page OR signup -> signup.jsp page -->
 					<td><input type = "submit" name = "login" value = "Login"></td>
 				</tr>
 			</table>
