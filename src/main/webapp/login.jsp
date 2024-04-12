@@ -12,10 +12,8 @@
 	</head>
 	
 	<body>
-		<!-- prints out sign in below in java --> 
-		<% out.println("Please sign in below"); %>
-							  
-		<br>
+		<h1> Login Page </h1>
+		<p> Please enter your username and password to login </p>		  
 		<form method="post">
 			<table>
 				<tr>
@@ -30,11 +28,33 @@
 				</tr>
 				<tr>
 				<!-- 2 options: either signup -> account.jsp page OR signup -> signup.jsp page -->
-					<td><input type = "submit" formaction = "checkLoginDetails.jsp" name = "signin" value = "SignIn"></td>
-					<td><input type = "submit" formaction = "signup.jsp" name = "signup" value = "SignUp"></td>
+					<td><input type = "submit" name = "signin" value = "Sign In"></td>
+					<td><input type = "submit" name = "signup" value = "Sign Up"></td>
 				</tr>
 			</table>
 		</form>
+
+		<%
+			// If user clicks on the signin button
+			if(request.getParameter("signin") != null){
+				String username = request.getParameter("username");
+				String password = request.getParameter("password");
+				if (!AuthenticationUtil.validateFormInput(username, password)){ // Checks if username and password are not empty
+					out.println("<p style='color:red;'>Please fill out all fields</p>");
+				}
+				else if (AuthenticationUtil.authenticate(username, password)){ // Checks if username and password are found in database
+					session.setAttribute("username", username);
+					response.sendRedirect("index.jsp");
+				}
+				else{
+					out.println("<p style='color:red;'>Incorrect username or password. Try again</p>");
+				}
+			}
+			// If user clicks on the signup button
+			else if(request.getParameter("signup") != null){
+				response.sendRedirect("signup.jsp");
+			}
+		%>
 
 </body>
 </html>
