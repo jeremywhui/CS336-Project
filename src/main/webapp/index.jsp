@@ -6,18 +6,26 @@
 <meta charset="ISO-8859-1">
 <title>Index</title>
 </head>
-<body>
-<%
-if ((session.getAttribute("username") == null)) {
-	response.sendRedirect("login.jsp");
-} else {
-%>
-<!-- this will display the username that is stored in the session. -->
-Welcome <%=session.getAttribute("username")%>
-<br>
-<a href='logout.jsp'>Log out</a>
-<%
-}
-%>
-</body>
+    <body>
+        <%
+            if ((session.getAttribute("username") == null)) {
+                response.sendRedirect("login.jsp");
+            }
+        %>
+        <h1>Index Page</h1>
+        <p>Welcome, <%= session.getAttribute("username") %></p>
+        <form method="post">
+            <button type="submit" name="logout">Logout</button>
+        </form>
+        <%
+            if ("POST".equals(request.getMethod()))
+            {
+                if (request.getParameter("logout") != null)
+                {
+                    session.invalidate();
+                    response.sendRedirect("login.jsp");
+                }
+            }
+        %>
+    </body>
 </html>

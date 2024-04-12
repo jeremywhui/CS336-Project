@@ -3,16 +3,13 @@ USE cs336Project;
 
 CREATE TABLE IF NOT EXISTS End_User(
     user_id INT AUTO_INCREMENT, 
-    username VARCHAR(100) NOT NULL, 
+    username VARCHAR(100) NOT NULL UNIQUE, 
     password VARCHAR(100) NOT NULL, 
-    email VARCHAR(50) NOT NULL, 
+    email VARCHAR(50) NOT NULL UNIQUE, 
     isSeller BOOLEAN, 
     isBuyer BOOLEAN, 
     PRIMARY KEY (user_id)
 );
 
-ALTER TABLE End_User
-ADD UNIQUE INDEX(username);
-
-INSERT IGNORE INTO End_User(username, password, email, isSeller, isBuyer)
-VALUES ('test', 'test', 'test@test.com', false, false);
+INSERT IGNORE INTO End_User(username, password, email)
+VALUES ('test', 'test', 'test@test.com');
