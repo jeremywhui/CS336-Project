@@ -30,13 +30,13 @@ public class AuthenticationUtil {
     }
 
     /**
-     * Authenticates a user against the end_user table in the database. The user is
-     * authenticated if the username and password match a record in the end_user
+     * Authenticates a user against the End_User table in the database. The user is
+     * authenticated if the username and password match a record in the End_User
      * table.
      *
      * @param username The username entered by the user.
      * @param password The password entered by the user.
-     * @return true if the username and password match a record in the end_user
+     * @return true if the username and password match a record in the End_User
      *         table, false otherwise.
      */
     public static boolean authenticateLoginAttempt(String username, String password) {
@@ -44,7 +44,7 @@ public class AuthenticationUtil {
         Connection con = db.getConnection();
 
         try (Statement stmt = con.createStatement()) {
-            String query = "SELECT * FROM end_user WHERE username = ? AND password = ?";
+            String query = "SELECT * FROM End_User WHERE username = ? AND password = ?";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setString(1, username);
             pstmt.setString(2, password);
@@ -91,10 +91,10 @@ public class AuthenticationUtil {
     }
 
     /**
-     * Registers a new user in the end_user table in the database. The user is
+     * Registers a new user in the End_User table in the database. The user is
      * registered if the username and email are unique. The registration is done by
      * inserting
-     * a new record into the end_user table.
+     * a new record into the End_User table.
      * 
      * @param email    The email entered by the user.
      * @param username The username entered by the user.
@@ -110,7 +110,7 @@ public class AuthenticationUtil {
         Connection con = db.getConnection();
 
         try (Statement stmt = con.createStatement()) {
-            String query = "INSERT INTO end_user (email, username, password) VALUES (?, ?, ?)";
+            String query = "INSERT INTO End_User (email, username, password) VALUES (?, ?, ?)";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setString(1, email);
             pstmt.setString(2, username);
@@ -133,7 +133,7 @@ public class AuthenticationUtil {
     }
 
     /**
-     * Checks if a username is unique by querying the end_user table in the
+     * Checks if a username is unique by querying the End_User table in the
      * database.
      *
      * @param username The username to check for uniqueness.
@@ -144,7 +144,7 @@ public class AuthenticationUtil {
         Connection con = db.getConnection();
 
         try (Statement stmt = con.createStatement()) {
-            String query = "SELECT * FROM end_user WHERE username = ?";
+            String query = "SELECT * FROM End_User WHERE username = ?";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setString(1, username);
             ResultSet result = pstmt.executeQuery();
@@ -168,7 +168,7 @@ public class AuthenticationUtil {
     }
 
     /**
-     * Checks if an email is unique by querying the end_user table in the database.
+     * Checks if an email is unique by querying the End_User table in the database.
      *
      * @param email The email to check for uniqueness.
      * @return true if the email is unique, false otherwise.
@@ -178,7 +178,7 @@ public class AuthenticationUtil {
         Connection con = db.getConnection();
 
         try (Statement stmt = con.createStatement()) {
-            String query = "SELECT * FROM end_user WHERE email = ?";
+            String query = "SELECT * FROM End_User WHERE email = ?";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setString(1, email);
             ResultSet result = pstmt.executeQuery();
