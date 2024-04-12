@@ -2,9 +2,21 @@ package com.cs336.pkg;
 
 import java.sql.*;
 
+/**
+ * This class provides utility methods for user authentication. This includes
+ * both signing in and signing up.
+ */
 public class AuthenticationUtil {
 
-    public static boolean validateFormInput(String username, String password) {
+    /**
+     * Validates the form input for signing in. The input is considered valid if
+     * both the username and password are not null and not empty.
+     *
+     * @param username The username entered by the user.
+     * @param password The password entered by the user.
+     * @return true if the username and password are not null and not empty, false otherwise.
+     */
+    public static boolean validateSignInInput(String username, String password) {
         if (username == null || password == null) {
             return false;
         }
@@ -16,6 +28,15 @@ public class AuthenticationUtil {
         return true;
     }
 
+    /**
+     * Authenticates a user against the end_user table in the database. The user is
+     * authenticated if the username and password match a record in the end_user
+     * table.
+     *
+     * @param username The username entered by the user.
+     * @param password The password entered by the user.
+     * @return true if the username and password match a record in the end_user table, false otherwise.
+     */
     public static boolean authenticate(String username, String password) {
         ApplicationDB db = new ApplicationDB();
         Connection con = db.getConnection();

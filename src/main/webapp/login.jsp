@@ -12,6 +12,11 @@
 	</head>
 	
 	<body>
+		<%
+			if(session.getAttribute("username") != null){ // If user is already logged in, redirect to index.jsp
+				response.sendRedirect("index.jsp");
+			}
+		%>
 		<h1> Login Page </h1>
 		<p> Please enter your username and password to login </p>		  
 		<form method="post">
@@ -39,7 +44,7 @@
 			if(request.getParameter("signin") != null){
 				String username = request.getParameter("username");
 				String password = request.getParameter("password");
-				if (!AuthenticationUtil.validateFormInput(username, password)){ // Checks if username and password are not empty
+				if (!AuthenticationUtil.validateSignInInput(username, password)){ // Checks if username and password are not empty
 					out.println("<p style='color:red;'>Please fill out all fields</p>");
 				}
 				else if (AuthenticationUtil.authenticate(username, password)){ // Checks if username and password are found in database
