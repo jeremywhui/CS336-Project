@@ -9,7 +9,11 @@ public class ApplicationDB {
 	public ApplicationDB(){
 		
 	}
-
+	
+	/**
+	 * Gets JDBC connection.
+	 * @return connection
+	 */
 	public Connection getConnection(){
 		
 		//Create a connection string
@@ -41,6 +45,10 @@ public class ApplicationDB {
 		
 	}
 	
+	/**
+	 * Closes JDBC connection.
+	 * @param connection
+	 */
 	public void closeConnection(Connection connection){
 		try {
 			connection.close();
