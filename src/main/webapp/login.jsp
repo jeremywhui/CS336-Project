@@ -48,6 +48,7 @@
 					}
 					else if (AuthenticationUtil.authenticateLoginAttempt(username, password)){ // Checks if username and password are found in database
 						session.setAttribute("username", username);
+						session.setAttribute("role", AuthorizationUtil.getRole(username));
 						response.sendRedirect("index");
 					}
 					else{
