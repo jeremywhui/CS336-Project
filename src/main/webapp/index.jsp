@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Index</title>
+<title>Home</title>
 </head>
     <body>
         <%
@@ -12,21 +12,9 @@
                 response.sendRedirect("login");
             }
         %>
-        <h1>Index Page</h1>
+        <jsp:include page="/WEB-INF/components/navbar.jsp" />
+        <h1>Home Page</h1>
         <p>Welcome, <%= session.getAttribute("username")%>!</p>
-        <form method="post">
-            <button type="submit" name="logout">Logout</button>
-        </form>
-        <%
-            if ("POST".equals(request.getMethod()))
-            {
-                if (request.getParameter("logout") != null) // If user clicks on the logout button, invalidate the session and redirect to login page
-                {
-                    session.invalidate();
-                    response.sendRedirect("login");
-                }
-            }
-        %>
         <h3>Post Shoes for Sale!</h3>
         <form method="post">
         	<label for="shoeName">Name:</label><br>
