@@ -8,8 +8,8 @@
 </head>
 <body>
     <%
-        if(session.getAttribute("username") != null){ // If user is already logged in, redirect to index.jsp
-            response.sendRedirect("index.jsp");
+        if(session.getAttribute("username") != null){ // If user is already logged in, redirect to index
+            response.sendRedirect("index");
         }
     %>
 
@@ -51,7 +51,7 @@
                 out.println("<p style='color:red;'>User with this username already exists. Try another username.</p>");
             }
             else if (AuthenticationUtil.registerNewUser(email, username, password)){ // Registers user in database
-                response.sendRedirect("login.jsp"); // Redirects to login page
+                response.sendRedirect("login"); // Redirects to login page
             }
             else{
                 out.println("<p style='color:red;'>Something went wrong.</p>");
@@ -60,6 +60,6 @@
     }
     %>
 
-    <p>Already have an account? <a href="login.jsp">Login</a></p>
+    <p>Already have an account? <a href="login">Login</a></p>
 </body>
 </html>

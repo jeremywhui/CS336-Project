@@ -13,8 +13,8 @@
 	
 	<body>
 		<%
-			if(session.getAttribute("username") != null){ // If user is already logged in, redirect to index.jsp
-				response.sendRedirect("index.jsp");
+			if(session.getAttribute("username") != null){ // If user is already logged in, redirect to index
+				response.sendRedirect("index");
 			}
 		%>
 
@@ -48,7 +48,7 @@
 					}
 					else if (AuthenticationUtil.authenticateLoginAttempt(username, password)){ // Checks if username and password are found in database
 						session.setAttribute("username", username);
-						response.sendRedirect("index.jsp");
+						response.sendRedirect("index");
 					}
 					else{
 						out.println("<p style='color:red;'>Incorrect username or password. Try again.</p>");
@@ -57,7 +57,7 @@
 			}
 		%>
 
-		<p>Don't have an account? <a href="register.jsp">Register here!</a></p>
+		<p>Don't have an account? <a href="register">Register here!</a></p>
 
 </body>
 </html>

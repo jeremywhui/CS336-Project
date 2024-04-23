@@ -9,7 +9,7 @@
     <body>
         <%
             if ((session.getAttribute("username") == null)) { // If user is not logged in, redirect to login page
-                response.sendRedirect("login.jsp");
+                response.sendRedirect("login");
             }
         %>
         <h1>Index Page</h1>
@@ -23,7 +23,7 @@
                 if (request.getParameter("logout") != null) // If user clicks on the logout button, invalidate the session and redirect to login page
                 {
                     session.invalidate();
-                    response.sendRedirect("login.jsp");
+                    response.sendRedirect("login");
                 }
             }
         %>
