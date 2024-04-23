@@ -16,13 +16,9 @@
     %>
 
 	<h1>Registration Page</h1>
-    <p>Please enter your email, username, and password to register a new account.</p>
+    <p>Please enter your username and password to register a new account.</p>
     <form method="post" action="">
         <table>
-            <tr>
-                <td>Email: </td>
-                <td><input type="text" name="email"></td>
-            </tr>
             <tr>
                 <td>Username: </td>
                 <td><input type="text" name="username"></td>
@@ -40,19 +36,15 @@
     <%
     if ("POST".equals(request.getMethod())) { // check if the form is submitted
         if(request.getParameter("register") != null){
-            String email = request.getParameter("email");
             String username = request.getParameter("username");
             String password = request.getParameter("password");
-            if (!AuthenticationUtil.validateRegistrationInput(email, username, password)){ // Checks if email, username, and password are not empty
+            if (!AuthenticationUtil.validateRegistrationInput(username, password)){ // Checks if username, and password are not empty
                 out.println("<p style='color:red;'>Please fill out all fields.</p>");
-            }
-            else if (!AuthenticationUtil.isEmailUnique(email)){ // Checks if email already exists
-                out.println("<p style='color:red;'>User with this email already exists. Try another email.</p>");
             }
             else if (!AuthenticationUtil.isUsernameUnique(username)){ // Checks if username already exists
                 out.println("<p style='color:red;'>User with this username already exists. Try another username.</p>");
             }
-            else if (AuthenticationUtil.registerNewUser(email, username, password)){ // Registers user in database
+            else if (AuthenticationUtil.registerNewUser(username, password)){ // Registers user in database
                 response.sendRedirect("login"); // Redirects to login page
             }
             else{
