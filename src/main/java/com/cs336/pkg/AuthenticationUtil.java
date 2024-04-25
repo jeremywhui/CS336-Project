@@ -129,6 +129,45 @@ public class AuthenticationUtil {
     }
 
     /**
+     * Register a new customer representative in the End_User table in the database.
+     * This is essentially the same as registering a new user, but with a different
+     * role.
+     * @param username the username entered by the admin.
+     * @param password the password entered by the admin.
+     * @return true if the user was successfully registered, false otherwise.
+     */
+    public static boolean registerNewCustomerRep(String username, String password) {
+        if (!isUsernameUnique(username)) {
+            return false;
+        }
+
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try (Statement stmt = con.createStatement()) {
+            String query = "INSERT INTO End_User (username, password, role) VALUES (?, ?, ?)";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            pstmt.setString(3, "Customer Representative");
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Checks if a username is unique by querying the End_User table in the
      * database.
      *
