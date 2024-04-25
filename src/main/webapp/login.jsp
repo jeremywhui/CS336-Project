@@ -24,11 +24,11 @@
 			<table>
 				<tr>
 					<td> Username: </td>
-					<td><input type = "text" name = "username"></td>
+					<td><input type = "text" name = "username" required></td>
 				</tr>
 				<tr>
 					<td> Password: </td>
-					<td><input type = "password" name = "password"></td>
+					<td><input type = "password" name = "password" required></td>
 				</tr>
 				<tr>
 					<td><input type = "submit" name = "login" value = "Login"></td>
@@ -43,10 +43,7 @@
 				if(request.getParameter("login") != null){
 					String username = request.getParameter("username");
 					String password = request.getParameter("password");
-					if (!AuthenticationUtil.validateLoginInput(username, password)){ // Checks if username and password are not empty
-						out.println("<p style='color:red;'>Please fill out all fields.</p>");
-					}
-					else if (AuthenticationUtil.authenticateLoginAttempt(username, password)){ // Checks if username and password are found in database
+					if (AuthenticationUtil.authenticateLoginAttempt(username, password)){ // Checks if username and password are found in database
 						session.setAttribute("username", username);
 						session.setAttribute("role", AuthorizationUtil.getRole(username));
 						response.sendRedirect("index");

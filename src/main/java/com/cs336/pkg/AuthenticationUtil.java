@@ -9,27 +9,6 @@ import java.sql.*;
 public class AuthenticationUtil {
 
     /**
-     * Validates the form input for logging in. The input is considered valid if
-     * both the username and password are not null and not empty.
-     *
-     * @param username The username entered by the user.
-     * @param password The password entered by the user.
-     * @return true if the username and password are not null and not empty, false
-     *         otherwise.
-     */
-    public static boolean validateLoginInput(String username, String password) {
-        if (username == null || password == null) {
-            return false;
-        }
-
-        if (username.length() == 0 || password.length() == 0) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Authenticates a user against the End_User table in the database. The user is
      * authenticated if the username and password match a record in the End_User
      * table.
@@ -66,27 +45,6 @@ public class AuthenticationUtil {
         }
 
         return false;
-    }
-
-    /**
-     * Validates the form input for registering a new user. The input is considered
-     * valid if the username and password are not null and not empty.
-     * 
-     * @param username The username entered by the user.
-     * @param password The password entered by the user.
-     * @return true if the username and password are not null and not empty,
-     *         false otherwise.
-     */
-    public static boolean validateRegistrationInput(String username, String password) {
-        if (username == null || password == null) {
-            return false;
-        }
-
-        if (username.length() == 0 || password.length() == 0) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -132,6 +90,7 @@ public class AuthenticationUtil {
      * Register a new customer representative in the End_User table in the database.
      * This is essentially the same as registering a new user, but with a different
      * role.
+     * 
      * @param username the username entered by the admin.
      * @param password the password entered by the admin.
      * @return true if the user was successfully registered, false otherwise.

@@ -21,11 +21,11 @@
         <table>
             <tr>
                 <td>Username: </td>
-                <td><input type="text" name="username"></td>
+                <td><input type="text" name="username" required></td>
             </tr>
             <tr>
                 <td>Password: </td>
-                <td><input type="password" name="password"></td>
+                <td><input type="password" name="password" required></td>
             </tr>
             <tr>
                 <td><input type="submit" name="register" value="Register"></td>
@@ -38,10 +38,7 @@
         if(request.getParameter("register") != null){
             String username = request.getParameter("username");
             String password = request.getParameter("password");
-            if (!AuthenticationUtil.validateRegistrationInput(username, password)){ // Checks if username, and password are not empty
-                out.println("<p style='color:red;'>Please fill out all fields.</p>");
-            }
-            else if (!AuthenticationUtil.isUsernameUnique(username)){ // Checks if username already exists
+            if (!AuthenticationUtil.isUsernameUnique(username)){ // Checks if username already exists
                 out.println("<p style='color:red;'>User with this username already exists. Try another username.</p>");
             }
             else if (AuthenticationUtil.registerNewUser(username, password)){ // Registers user in database
