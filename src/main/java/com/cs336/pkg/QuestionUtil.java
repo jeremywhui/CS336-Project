@@ -127,7 +127,7 @@ public class QuestionUtil {
         Connection con = db.getConnection();
 
         try (Statement stmt = con.createStatement()) {
-            String query = "SELECT question from question where username = ?";
+            String query = "SELECT question from question where username = ? order by question_id";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setString(1, username);
             ResultSet result = pstmt.executeQuery();
@@ -161,7 +161,7 @@ public class QuestionUtil {
         Connection con = db.getConnection();
 
         try (Statement stmt = con.createStatement()) {
-            String query = "SELECT answer from question where username = ?";
+            String query = "SELECT answer from question where username = ? order by question_id";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setString(1, username);
             ResultSet result = pstmt.executeQuery();
@@ -195,7 +195,7 @@ public class QuestionUtil {
        Connection con = db.getConnection();
 
        try (Statement stmt = con.createStatement()) {
-           String query = "SELECT question_id from question where username = ?";
+           String query = "SELECT question_id from question where username = ? order by question_id";
            PreparedStatement pstmt = con.prepareStatement(query);
            pstmt.setString(1, username);
            ResultSet result = pstmt.executeQuery();
@@ -362,7 +362,7 @@ public class QuestionUtil {
      */
     public static Map<String, String> findKeywords(String keyword) {
         Map<String, String> keyValueList = new HashMap<>();
-        ArrayList<Integer> question_ids = new ArrayList<Integer>();
+        // ArrayList<Integer> question_ids = new ArrayList<Integer>();
         ApplicationDB db = new ApplicationDB();
         Connection con = db.getConnection();
 
@@ -377,10 +377,11 @@ public class QuestionUtil {
                 String answer = result.getString("answer");
                 int qid = result.getInt("question_id");
 
-                if (!question_ids.contains(qid)){
-                    keyValueList.put(question, answer);
-                    question_ids.add(qid);
-                }                
+                keyValueList.put(question, answer);
+                // if (!question_ids.contains(qid)){
+                //     keyValueList.put(question, answer);
+                //     question_ids.add(qid);
+                // }                
             }
 
             String query2 = "SELECT question, answer, question_id from question where question LIKE ?";
@@ -393,10 +394,11 @@ public class QuestionUtil {
                 String answer = result2.getString("answer");
                 int qid = result2.getInt("question_id");
 
-                if (!question_ids.contains(qid)) {
-                    keyValueList.put(question, answer);
-                    question_ids.add(qid);
-                }
+                keyValueList.put(question, answer);
+                // if (!question_ids.contains(qid)) {
+                //     keyValueList.put(question, answer);
+                //     question_ids.add(qid);
+                // }
             }
 
             String query3 = "SELECT question, answer, question_id from question where question LIKE ?";
@@ -409,10 +411,11 @@ public class QuestionUtil {
                 String answer = result3.getString("answer");
                 int qid = result3.getInt("question_id");
 
-                if (!question_ids.contains(qid)) {
-                    keyValueList.put(question, answer);
-                    question_ids.add(qid);
-                } 
+                keyValueList.put(question, answer);
+                // if (!question_ids.contains(qid)) {
+                //     keyValueList.put(question, answer);
+                //     question_ids.add(qid);
+                // } 
             }
         } catch (SQLException e) {
             e.printStackTrace();
