@@ -92,7 +92,6 @@
                         height: 50px;
                     }
                 </style>
-        
 
                 <% if ("POST".equals(request.getMethod())) { // check if a form is submitted
 					if (request.getParameter("question") != null) { // Check if the question form was submitted
@@ -268,8 +267,46 @@
             }
             
    			else if (QuestionUtil.checkUser(username) == 1){ // admin %>
+   				<style>
+                table {
+                    border: 1px solid gray;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    width: 250px;
+                    height: 30px;
+                    border: 1px solid gray;
+                    padding: 2px;
+                }
+                tr:first-child td{
+                    height: 50px;
+                }
+                </style>   			
    			
-   				
+   				<table>
+                   <h2> All Questions </h2>
+                   <tr>
+                       <td><h3>Usernames</h3></td>
+                       <td><h3>Questions</h3></td>
+                       <td><h3>Answers</h3></td>
+                   </tr>
+                   <%
+                   ArrayList<String> usernames = QuestionUtil.getUsernames();
+                   ArrayList<String> questions = QuestionUtil.getQuestions();
+                   ArrayList<String> answers = QuestionUtil.getAnswers();
+       
+                   for (int i = 0; i < questions.size(); i++) {
+                       String usernameRecord = usernames.get(i);
+                       String question = questions.get(i);
+                       String answer = answers.get(i);
+                   %>
+                   <tr>
+                       <td><%=usernameRecord %></td>
+                       <td><%=question %></td>
+                       <td><%=answer %></td>
+                   </tr>
+                   <% } %>
+               </table>
    			<% }
    			else{
    				out.println("<p style='color:red;'> Error </p>");
