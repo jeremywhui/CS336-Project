@@ -62,11 +62,16 @@
 	                	if(request.getParameter("changeUser") != null){ // if change username form was submitted
 	                		if (request.getParameter("newUsername") != ""){ // if newUsername field is filled
 	                			String newUsername = request.getParameter("newUsername");
-	                			if (AdminUtil.updateUsername(originalUsername, newUsername)){
-	                				// success
+	                			if (newUsername.length() <= 100){
+	                				if (AdminUtil.updateUsername(originalUsername, newUsername)){
+		                				// success
+		                			}
+		                			else{
+		                				out.println("<p style='color:red;'>Error</p>");
+		                			}
 	                			}
 	                			else{
-	                				out.println("<p style='color:red;'>Error</p>");
+	                				out.println("<p style='color:red;'>Username must be less than 100 characters </p>");
 	                			}
 	                		}
 	                		else{
@@ -77,11 +82,16 @@
 	                	else if(request.getParameter("changePassword") != null){ // if change password form was submitted
 	                		if (request.getParameter("newPassword") != ""){ // if newPassword field is filled
 	                			String newPassword = request.getParameter("newPassword");
-	                			if (AdminUtil.updatePassword(originalUsername, newPassword)){
-	                				// success
+	                			if (newPassword.length() <= 100){
+	                				if (AdminUtil.updatePassword(originalUsername, newPassword)){
+		                				// success
+		                			}
+		                			else{
+		                				out.println("<p style='color:red;'>Error</p>");
+		                			}
 	                			}
 	                			else{
-	                				out.println("<p style='color:red;'>Error</p>");
+	                				out.println("<p style='color:red;'>Password must be less than 100 characters </p>");
 	                			}
 	                		}
 	                		else{

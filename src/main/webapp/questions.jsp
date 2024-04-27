@@ -97,35 +97,40 @@
 					if (request.getParameter("question") != null) { // Check if the question form was submitted
                         String question = request.getParameter("question");
                         if (!QuestionUtil.existsInTable(question)){
-                            if (QuestionUtil.askQuestion(username, question)){%>
-                                <table>
-	                            <h2> My Questions </h2>
-	                            <tr>
-	                                <td><h3>Question ID</h3></td>
-	                                <td><h3>Questions</h3></td>
-	                                <td><h3>Answers</h3></td>
-	                            </tr>
-	                            <%
-	                            ArrayList<Integer> QIDs = QuestionUtil.getQIDs(username);
-	                            ArrayList<String> questions = QuestionUtil.getQuestions(username);
-	                            ArrayList<String> answers = QuestionUtil.getAnswers(username);
-	                
-	                            for (int i = 0; i < questions.size(); i++) {
-	                                int qid = QIDs.get(i);
-	                                String questioNN = questions.get(i);
-	                                String answer = answers.get(i);
-	                            %>
-	                            <tr>
-	                                <td><%=qid %></td>
-	                                <td><%=questioNN %></td>
-	                                <td><%=answer %></td>
-	                            </tr>
-	                            <% } %>
-	                            </table>
-                            <%}
-                            else{
-                                out.println("<p style='color:red;'>Error adding question to database </p>");
-                            }
+                        	if (question.length() <= 150){
+                        		if (QuestionUtil.askQuestion(username, question)){%>
+	                                <table>
+		                            <h2> My Questions </h2>
+		                            <tr>
+		                                <td><h3>Question ID</h3></td>
+		                                <td><h3>Questions</h3></td>
+		                                <td><h3>Answers</h3></td>
+		                            </tr>
+		                            <%
+		                            ArrayList<Integer> QIDs = QuestionUtil.getQIDs(username);
+		                            ArrayList<String> questions = QuestionUtil.getQuestions(username);
+		                            ArrayList<String> answers = QuestionUtil.getAnswers(username);
+		                
+		                            for (int i = 0; i < questions.size(); i++) {
+		                                int qid = QIDs.get(i);
+		                                String questioNN = questions.get(i);
+		                                String answer = answers.get(i);
+		                            %>
+		                            <tr>
+		                                <td><%=qid %></td>
+		                                <td><%=questioNN %></td>
+		                                <td><%=answer %></td>
+		                            </tr>
+		                            <% } %>
+		                            </table>
+	                            <%}
+	                            else{
+	                                out.println("<p style='color:red;'>Error adding question to database </p>");
+	                            }
+                        	}
+                        	else{
+                        		out.println("<p style='color:red;'>Question must be 150 characters or less </p>");
+                        	}
                         }
                         else{
                             out.println("<p style='color:red;'>Duplicate question </p>");
@@ -278,6 +283,9 @@
                     String answer = request.getParameter("answer");
                     if (!QuestionUtil.validateQuestionID(qid)){ // Checks qid is a valid question_id
                         out.println("<p style='color:red;'>Not a valid question number.</p>");
+                    }
+                    else if (answer.length() > 150){
+                    	out.println("<p style='color:red;'>Question answer must be 150 characters or less </p>");
                     }
                     else if (QuestionUtil.answerQuestion(qid, answer)){ // entered question and qid into database
                         response.sendRedirect("questions");
