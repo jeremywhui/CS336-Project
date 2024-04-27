@@ -39,6 +39,14 @@
       <url-pattern>/admin</url-pattern>
   </servlet-mapping>
   <servlet>
+    <servlet-name>CustomerRepServlet</servlet-name>
+    <jsp-file>/customerrep.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+      <servlet-name>CustomerRepServlet</servlet-name>
+      <url-pattern>/customerrep</url-pattern>
+  </servlet-mapping>
+  <servlet>
       <servlet-name>AlertsServlet</servlet-name>
       <jsp-file>/alerts.jsp</jsp-file>
   </servlet>
