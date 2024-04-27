@@ -37,9 +37,11 @@
         <form method="post">
                     <p>Customer Account Username: <span style="color: red;">(not case sensitive)</span></p>
                     <input type = "text" name = "username" required>
-					<h5></h5>
                     
                     <table style="border: none;">
+                    	<tr>
+					        <td colspan="3" style="border: none;"><input type="submit" name="deleteUser" value="Delete User's Account"></td>
+					    </tr>
 					    <tr>
 					        <td style="border: none; width: 105px;">New Username:</td>
 					        <td style="border: none; width: 95px;"><input type="text" name="newUsername"></td>
@@ -56,7 +58,7 @@
                 
                 <%if ("POST".equals(request.getMethod())) {
                 	String originalUsername = request.getParameter("username");
-                	if (AdminUtil.existsInTable(originalUsername)){
+                	if (AdminUtil.existsInTable(originalUsername)){ // if the username exists
 	                	if(request.getParameter("changeUser") != null){ // if change username form was submitted
 	                		if (request.getParameter("newUsername") != ""){ // if newUsername field is filled
 	                			String newUsername = request.getParameter("newUsername");
@@ -84,6 +86,14 @@
 	                		}
 	                		else{
 	                			out.println("<p style='color:red;'>Please fill out a password</p>");
+	                		}
+	                	}
+	                	else if (request.getParameter("deleteUser") != null){ // if deleteUser form was submitted
+	                		if (AdminUtil.deleteUser(originalUsername)){
+	                			// success
+	                		}
+	                		else{
+	                			out.println("<p style='color:red;'> Error </p>");
 	                		}
 	                	}
 	                	else {
