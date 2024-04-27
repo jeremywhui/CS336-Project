@@ -52,7 +52,7 @@ public class QuestionUtil {
     }
 
     /**
-     * adds a question to the table from a user
+     * checks whether question exists in table
      *
      * @param question 
      * @return true or false based whether it exists already
