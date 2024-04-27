@@ -82,7 +82,8 @@ public class AdminUtil {
     
     /**
      * changes the username of the specified username
-     *
+     * 
+     * @param originalUsername
      * @param newUsername
      * @return true or false based on success
      */
@@ -112,17 +113,47 @@ public class AdminUtil {
     }
     
     /**
-     * changes the password of the specified username
+     * deletes the user from the database
      *
-     * @param newPassword
+     * @param username
      * @return true or false based on success
      */
-    public static boolean updatePassword (String username, String newPassword){
+    public static boolean deleteUser (String username){
     	ApplicationDB db = new ApplicationDB();
         Connection con = db.getConnection();
 
         try (Statement stmt = con.createStatement()) {
-        	String insertQuery = "UPDATE end_user SET password = ? WHERE username = ?";
+        	String insertQuery = "DELETE FROM end_user WHERE username = ?";
+            PreparedStatement pstmt = con.prepareStatement(insertQuery);
+            pstmt.setString(1, username);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * changes the password of the specified username
+     *
+     * @param username
+     * @return true or false based on success
+     */
+    public static boolean updatePassword(String username, String newPassword) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try (Statement stmt = con.createStatement()) {
+            String insertQuery = "UPDATE end_user SET password = ? WHERE username = ?";
             PreparedStatement pstmt = con.prepareStatement(insertQuery);
             pstmt.setString(1, newPassword);
             pstmt.setString(2, username);
