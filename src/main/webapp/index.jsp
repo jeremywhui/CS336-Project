@@ -2,6 +2,7 @@
     pageEncoding="ISO-8859-1" import="com.cs336.pkg.*"%>
 <%@ page import="java.io.*,java.util.*,java.sql.*"%>
 <%@ page import="javax.servlet.http.*,javax.servlet.*" %>
+<!--<%@ page import="java.text.ParseException, java.text.SimpleDateFormat" %>-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,6 +14,7 @@
             if ((session.getAttribute("username") == null)) { // If user is not logged in, redirect to login page
                 response.sendRedirect("login");
             }
+        	String username = (String)session.getAttribute("username");
         %>
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
         <h1>Home Page</h1>
@@ -56,11 +58,11 @@
 			</select><br>
 			<div id="boots" style="display: none">
 				<label for="height">Height (inches):</label><br>
-				<input type="number" min="0" max="100" step="any"><br>
+				<input type="number" name="height" min="0" max="100" step="any"><br>
 			</div>
 			<div id="sandals" style="display: none">
 				<label for="openToed">Open Toed:</label><br>
-				<select>
+				<select name="openToed">
 				<option value=""></option>
 				<option value="true"> Yes </option>
 				<option value="false"> No </option>
@@ -68,7 +70,7 @@
 			</div>
 			<div id="sneakers" style="display: none">
 				<label for="sport">Sport:</label><br>
-				<input type="text"><br>
+				<input type="text" name="sport"><br>
 			</div>
 			<br>
 			<input type = "submit" name = "createAuction" value = "Create Auction">
@@ -88,8 +90,8 @@
 			// Check if the request was a POST request
 			if ("POST".equals(request.getMethod())) {
 				// If user clicks on the login button
-				if(request.getParameter("createAuction") != null){
-					boolean allFieldsFilled = true;
+				if(request.getParameter("createAuction") != null){					
+					//boolean allFieldsFilled = true;
 
 					String shoeName = request.getParameter("shoeName");
 					String brand = request.getParameter("brand");
@@ -101,30 +103,70 @@
 					String minBidIncrement = request.getParameter("minBidIncrement");
 					String hiddenMinPrice = request.getParameter("hiddenMinPrice");
 					String shoeType = request.getParameter("shoeType");
-					String height = "", sport = "", openToed = "";
-					if (shoeType.equals("boots")) {
-						out.println("<p style='color:black;'>Boots!</p>");
-						height = (String) request.getParameter("height");
-						out.println(request.getParameter("height"));
-						if (height == null || height.equals("")) allFieldsFilled = false;
-					} else if (shoeType.equals("sandals")) {
-						out.println("<p style='color:black;'>Sandals!</p>");
-						openToed = request.getParameter("openToed");
-						if (openToed == null || openToed.equals("")) allFieldsFilled = false;
-					} else {
-						out.println("<p style='color:black;'>Sneakers!</p>");
-						sport = request.getParameter("sport");
-						if (sport == null || sport.equals("")) allFieldsFilled = false;
-					}
-					if (allFieldsFilled) {
-						if (!CreateAuction.createShoeListing(shoeName, brand, color, quality, size, gender, closingDateTime, minBidIncrement, hiddenMinPrice, shoeType, height, openToed, sport, (String) session.getAttribute("username"))){
-							out.println("<p style='color:black;'>Auction created.</p>");
+					if (shoeType.equals("boots")) { // user chose boots
+						String height = (String) request.getParameter("height");
+						if (height == null | height == ""){
+							out.println("<p style='color:red;'>Fill in all the fields my dude thx</p>");
 						}
 						else{
-							out.println("<p style='color:black;'>Cannot create auction. Try again.</p>");
+							out.println("we gonna make a boots auction now");
+							if(CreateAuction.createShoeListing(shoeName, brand, color, quality, size, gender, closingDateTime, minBidIncrement, hiddenMinPrice, shoeType, height, null, null, username)){
+								out.println("slay we created an auction");
+							}
+							else{
+								out.println("you screwed up somewhere. try again womp womp");
+							}
 						}
-					} else {
-						out.println("<p style='color:red;'>Please fill in empty fields.</p>");
+						//out.println("<p style='color:black;'>Boots!</p>");
+						//out.println(request.getParameter("height"));
+						//if (height == null || height.equals("")) allFieldsFilled = false;
+					} else if (shoeType.equals("sandals")) {
+						String openToed = request.getParameter("openToed");
+						if (openToed == null || openToed.equals("")){
+							out.println("<p style='color:red;'>Fill in all the fields my dude thx</p>");
+						}
+						else{
+							out.println("we gonna make a sandals auction now");
+							if(CreateAuction.createShoeListing(shoeName, brand, color, quality, size, gender, closingDateTime, minBidIncrement, hiddenMinPrice, shoeType, null, openToed, null, username)){
+								out.println("slay we created an auction");
+							}
+							else{
+								out.println("you screwed up somewhere. try again womp womp");
+							}
+						}
+						//out.println("<p style='color:black;'>Sandals!</p>");
+						//openToed = request.getParameter("openToed");
+						//if (openToed == null || openToed.equals("")) allFieldsFilled = false;
+					} else if (shoeType.equals("sneakers")) {
+						String sport = (String) request.getParameter("sport");
+						if ((sport == null || sport.equals(""))){
+							out.println("<p style='color:red;'>Fill in all the fields my dude thx</p>");
+						}
+						else{
+							out.println("we gonna make a sneakers auction now");
+							if(CreateAuction.createShoeListing(shoeName, brand, color, quality, size, gender, closingDateTime, minBidIncrement, hiddenMinPrice, shoeType, null, null, sport, username)){
+								out.println("slay we created an auction");
+							}
+							else{
+								out.println("you screwed up somewhere. try again womp womp");
+							}
+						}
+						//out.println("<p style='color:black;'>Sneakers!</p>");
+						//sport = request.getParameter("sport");
+						//if (sport == null || sport.equals("")) allFieldsFilled = false;
+					}
+					//if (allFieldsFilled) {
+						//if (!CreateAuction.createShoeListing(shoeName, brand, color, quality, size, gender, closingDateTime, minBidIncrement, hiddenMinPrice, shoeType, height, openToed, sport, (String) session.getAttribute("username"))){
+							//out.println("<p style='color:black;'>Auction created.</p>");
+						//}
+						//else{
+							//out.println("<p style='color:black;'>Cannot create auction. Try again.</p>");
+						//}
+					//} else {
+						//out.println("<p style='color:red;'>Please fill in empty fields.</p>");
+					//}
+					else{
+						out.println("idk how you can get an error here but here we go!");
 					}
 				}
 			}
