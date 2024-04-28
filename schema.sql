@@ -11,6 +11,59 @@ INSERT IGNORE INTO End_User(username, password, role)
 VALUES ('test', 'test', NULL),
        ('admin', 'admin', 'Admin'),
        ('cr', 'cr', 'Customer Representative');
+
+CREATE TABLE Shoe_Listing(
+    gender CHAR(1) NOT NULL,
+    size FLOAT NOT NULL,
+    brand VARCHAR(20) NOT NULL,
+    quality VARCHAR(10) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    color VARCHAR(20) NOT NULL,
+    shoe_id INT AUTO_INCREMENT,
+    bid_increment DECIMAL(10, 2) NOT NULL,
+    list_end_datetime DATETIME NOT NULL,
+    secret_min_price DECIMAL(10, 2) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    username VARCHAR(100), 
+    PRIMARY KEY (shoe_id), 
+    FOREIGN KEY (username) REFERENCES End_User (username) ON DELETE CASCADE
+);
+
+CREATE TABLE Boots(shoe_id INT, height FLOAT, 
+PRIMARY KEY (shoe_id), 
+FOREIGN KEY (shoe_id) REFERENCES Shoe_Listing (shoe_id) ON DELETE CASCADE);
+
+CREATE TABLE Sandals(shoe_id INT, open_toed BOOLEAN,
+PRIMARY KEY(shoe_id),
+FOREIGN KEY(shoe_id) REFERENCES Shoe_Listing (shoe_id) ON DELETE CASCADE);
+
+CREATE TABLE Sneakers(shoe_id INT, sport VARCHAR(20),
+PRIMARY KEY (shoe_id),
+FOREIGN KEY (shoe_id) REFERENCES Shoe_Listing (shoe_id) ON DELETE CASCADE);
+
+
+CREATE TABLE Alert(
+    gender CHAR(1),
+    size FLOAT,
+    brand VARCHAR(20),
+    quality VARCHAR(10),
+    name VARCHAR(50),
+    color VARCHAR(20),
+    alert_id INT AUTO_INCREMENT,
+    username VARCHAR(100),
+    PRIMARY KEY (alert_id, username),
+    FOREIGN KEY (username) REFERENCES End_User (username) ON DELETE CASCADE
+);
+
+CREATE TABLE Alert_For_S(
+    alert_id INT,
+    username VARCHAR(100),
+    shoe_id INT,
+    PRIMARY KEY (alert_id, username, shoe_id),
+    FOREIGN KEY (alert_id, username) REFERENCES Alert(alert_id, username) ON DELETE CASCADE,
+    FOREIGN KEY (shoe_id) REFERENCES Shoe_Listing (shoe_id) ON DELETE CASCADE
+);
+
        
 CREATE TABLE IF NOT EXISTS Question (
 	question_id INT AUTO_INCREMENT,

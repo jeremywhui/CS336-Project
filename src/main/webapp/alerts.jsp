@@ -16,5 +16,6 @@
         %>
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
         <h1>Alerts Page</h1>
+        <p>Welcome, <%= session.getAttribute("username")%>!</p>
     </body>
 </html>
