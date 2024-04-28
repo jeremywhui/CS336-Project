@@ -46,7 +46,7 @@
 			<label for="closingDateTime">Closing Date/Time (YYYY-MM-DD HH:MI:SS):</label><br>
 			<input type = "datetime-local" id="closingDateTime" name = "closingDateTime" required><br>
 			<label for="minBidIncrement"></label>Minimum Bid Increment:<br>
-			<input type = "number" min="0.01" max="9999999.99" step="0.01" id="hiddenMinPrice" name = "hiddenMinPrice" required><br>
+			<input type = "number" min="0.01" max="9999999.99" step="0.01" id="minBidIncrement" name = "minBidIncrement" required><br>
 			<label for="hiddenMinPrice"></label>Hidden Minimum Price (reserve):<br>
 			<input type = "number" min="0.01" max="9999999.99" step="0.01" id="hiddenMinPrice" name = "hiddenMinPrice" required><br>
 			<label for="shoeType">Shoe Type</label><br>
