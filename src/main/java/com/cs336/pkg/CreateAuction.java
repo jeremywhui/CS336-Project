@@ -46,7 +46,7 @@ public class CreateAuction {
             pstmt.setString(7, closingDateTime);
             pstmt.setString(8, minBidIncrement);
             pstmt.setString(9, hiddenMinPrice);
-            pstmt.setString(10, null);
+            pstmt.setString(10, "0");
             pstmt.setString(11, username);
             pstmt.executeUpdate();
             return true;
