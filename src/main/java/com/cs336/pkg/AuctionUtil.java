@@ -7,6 +7,7 @@ import com.cs336.pkg.models.SneakersAuction;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.*;
 
 import com.cs336.pkg.models.BootsAuction;
 
@@ -184,19 +185,41 @@ public class AuctionUtil {
                 shoesAuctions.add(new BootsAuction(shoesId, username, name, brand, color, quality, size, gender,
                         deadline, minBidIncrement, secretMinPrice, currentPrice, height));
             }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return shoesAuctions;
+    }
+    /**
+     * 
+     * @return
+     */
+    public static ArrayList<String[]> displayShoesAuction() {
+        ArrayList<String[]> res = new ArrayList<>();
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try (Statement stmt = con.createStatement()) {
+            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) ORDER BY shoes_id";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            ResultSet result = pstmt.executeQuery();
+ 
+            while (result.next()) { // while there are results
+                res.add(new String[] {Integer.toString(result.getInt("shoes_id")), result.getString("seller_username"),result.getString("brand"), result.getString("color"), result.getString("quality"), Float.toString(result.getFloat("size")), result.getString("gender"), result.getString("deadline"), Double.toString(result.getDouble("min_bid_increment")), Double.toString(result.getDouble("current_price")), Double.toString(result.getDouble("height")), Boolean.toString(result.getBoolean("is_open_toed")), result.getString("sport")}); // get answer from current row
+            }
+            
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             if (con != null) {
                 try {
                     con.close();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             }
         }
-
-        return shoesAuctions;
+        return res;
     }
-
 }

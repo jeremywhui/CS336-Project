@@ -69,7 +69,7 @@ CREATE TABLE Alert_For_S(
     shoe_id INT,
     PRIMARY KEY (alert_id, username, shoe_id),
     FOREIGN KEY (alert_id, username) REFERENCES Alert(alert_id, username) ON DELETE CASCADE,
-    FOREIGN KEY (shoe_id) REFERENCES Shoe_Listing (shoe_id) ON DELETE CASCADE
+    FOREIGN KEY (shoe_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE
 );
 
        

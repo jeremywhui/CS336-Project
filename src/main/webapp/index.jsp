@@ -91,6 +91,7 @@
 				<label for="height">Height:</label><br>
 				<input type="number" id="height" name="height" step="0.1"><br>
 			</div>
+			<br>
 			<input type="submit" name="createAuction" value="Create Auction">
 		</form>
 
