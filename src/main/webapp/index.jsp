@@ -1,5 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1" import="com.cs336.pkg.*"%>
+<%@ page import="com.cs336.pkg.models.ShoesAuction" %>
+<%@ page import="com.cs336.pkg.models.SandalsAuction" %>
+<%@ page import="com.cs336.pkg.models.BootsAuction" %>
+<%@ page import="com.cs336.pkg.models.SneakersAuction" %>
+<%@ page import="java.time.LocalDateTime" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.io.*,java.util.*,java.sql.*"%>
 <%@ page import="javax.servlet.http.*,javax.servlet.*" %>
 <!--<%@ page import="java.text.ParseException, java.text.SimpleDateFormat" %>-->
@@ -16,157 +22,133 @@
             }
         	String username = (String)session.getAttribute("username");
         %>
+		<script>
+		window.onload = function() {
+			var now = new Date();
+			now.setDate(now.getDate() + 1);
+			var year = now.getFullYear();
+			var month = (now.getMonth() + 1).toString().padStart(2, '0');
+			var day = now.getDate().toString().padStart(2, '0');
+			var hour = now.getHours().toString().padStart(2, '0');
+			var minute = now.getMinutes().toString().padStart(2, '0');
+			var minDateTime = year + '-' + month + '-' + day + 'T' + hour + ':' + minute;
+			document.getElementById('deadline').min = minDateTime;
+		}
+		</script>
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
         <h1>Home Page</h1>
         <p>Welcome, <%= session.getAttribute("username")%>!</p>
         <h3>Post Shoes for Sale!</h3>
         <form method="post">
-        	<label for="shoeName">Name:</label><br>
-			<input type = "text" id="shoeName" name = "shoeName" required maxlength="50"><br>
+			<label for="name">Name:</label><br>
+			<input type="text" id="name" name="name" maxlength="50" required><br>
 			<label for="brand">Brand:</label><br>
-			<input type = "text" id="brand" name = "brand" required maxlength="20"><br>
+			<input type="text" id="brand" name="brand" maxlength="20" required><br>
 			<label for="color">Color:</label><br>
-			<input type = "text" id="color" name = "color" required maxlength="20"><br>
+			<input type="text" id="color" name="color" maxlength="20" required><br>
 			<label for="quality">Quality:</label><br>
-			<select name="quality" required>
-			<option value=""></option>
-			<option value="new"> New </option>
-			<option value="veryGood"> Very Good </option>
-			<option value="good"> Good </option>
-			<option value="acceptable"> Acceptable </option>
-  			</select><br>
-			<label for="size">Size:</label><br>
-			<input type = "number" min="1" max="20" step="0.5" id="size" name = "size" required><br>
-			<label for="gender">Gender:</label><br>
-			<select name="gender" required>
-			<option value=""></option>
-			<option value="male"> Male </option>
-			<option value="female"> Female </option>                 
-  			</select><br>
-			<label for="closingDateTime">Closing Date/Time (YYYY-MM-DD HH:MI:SS):</label><br>
-			<input type = "datetime-local" id="closingDateTime" name = "closingDateTime" required><br>
-			<label for="minBidIncrement"></label>Minimum Bid Increment:<br>
-			<input type = "number" min="0.01" max="9999999.99" step="0.01" id="minBidIncrement" name = "minBidIncrement" required><br>
-			<label for="hiddenMinPrice"></label>Hidden Minimum Price (reserve):<br>
-			<input type = "number" min="0.01" max="9999999.99" step="0.01" id="hiddenMinPrice" name = "hiddenMinPrice" required><br>
-			<label for="shoeType">Shoe Type</label><br>
-			<select name="shoeType" id="shoeType" onchange="showDiv(this)" required>
-			<option value=""></option>
-			<option value="boots">Boots</option>
-			<option value="sandals">Sandals</option>
-			<option value="sneakers">Sneakers</option>
+			<select id="quality" name="quality" required>
+				<option value="">Select a quality</option>
+				<option value="New">New</option>
+				<option value="Used">Used</option>
+				<option value="Refurbished">Refurbished</option>
 			</select><br>
-			<div id="boots" style="display: none">
-				<label for="height">Height (inches):</label><br>
-				<input type="number" name="height" min="0" max="100" step="any"><br>
-			</div>
-			<div id="sandals" style="display: none">
-				<label for="openToed">Open Toed:</label><br>
-				<select name="openToed">
-				<option value=""></option>
-				<option value="true"> Yes </option>
-				<option value="false"> No </option>
+			<label for="size">Size:</label><br>
+			<input type="number" id="size" name="size" step="0.5" min="0" max="20" required><br>
+			<label for="gender">Gender:</label><br>
+			<select id="gender" name="gender" required>
+				<option value="">Select a gender</option>
+				<option value="M">Male</option>
+				<option value="F">Female</option>
+				<option value="U">Unisex</option>
+			</select><br>
+			<label for="deadline">Deadline:</label><br>
+			<input type="datetime-local" id="deadline" name="deadline" required><br>
+			<label for="minBidIncrement">Minimum Bid Increment:</label><br>
+			<input type="number" id="minBidIncrement" name="minBidIncrement" step="0.01" min="0.01" max="9999999999.99" required><br>
+			<label for="secretMinPrice">Secret Minimum Price:</label><br>
+			<input type="number" id="secretMinPrice" name="secretMinPrice" step="0.01" min="0.01" max="9999999999.99" required><br>
+			<label for="shoeType">Shoe Type:</label><br>
+			<select id="shoeType" name="shoeType" onchange="showShoeTypeFields(this.value)" required>
+				<option value="">Select a type</option>
+				<option value="sandals">Sandals</option>
+				<option value="sneakers">Sneakers</option>
+				<option value="boots">Boots</option>
+			</select><br>
+			<div id="sandalsFields" style="display: none;">
+				<label for="isOpenToed">Is Open Toed:</label><br>
+				<select id="isOpenToed" name="isOpenToed" required>
+					<option value="">Select an option</option>
+					<option value="true">True</option>
+					<option value="false">False</option>
 				</select><br>
 			</div>
-			<div id="sneakers" style="display: none">
+			<div id="sneakersFields" style="display: none;">
 				<label for="sport">Sport:</label><br>
-				<input type="text" name="sport"><br>
+				<input type="text" id="sport" name="sport" maxlength="20"><br>
 			</div>
-			<br>
-			<input type = "submit" name = "createAuction" value = "Create Auction">
+			<div id="bootsFields" style="display: none;">
+				<label for="height">Height:</label><br>
+				<input type="number" id="height" name="height" step="0.1"><br>
+			</div>
+			<input type="submit" name="createAuction" value="Create Auction">
 		</form>
 
-		<script>
-		<%-- Functionality to show shoe specific options --%>
-		function showDiv(element)
-		{
-			document.getElementById("boots").style.display = element.value == "boots" ? 'block' : 'none';
-			document.getElementById("sandals").style.display = element.value == "sandals" ? 'block' : 'none';
-			document.getElementById("sneakers").style.display = element.value == "sneakers" ? 'block' : 'none';
-		}
-		</script>
+	<script>
+	function showShoeTypeFields(shoeType) {
+		document.getElementById('sandalsFields').style.display = 'none';
+		document.getElementById('sneakersFields').style.display = 'none';
+		document.getElementById('bootsFields').style.display = 'none';
 
-		<%
+		document.getElementById('isOpenToed').required = false;
+		document.getElementById('sport').required = false;
+		document.getElementById('height').required = false;
+
+		if (shoeType === 'sandals') {
+			document.getElementById('sandalsFields').style.display = 'block';
+			document.getElementById('isOpenToed').required = true;
+		} else if (shoeType === 'sneakers') {
+			document.getElementById('sneakersFields').style.display = 'block';
+			document.getElementById('sport').required = true;
+		} else if (shoeType === 'boots') {
+			document.getElementById('bootsFields').style.display = 'block';
+			document.getElementById('height').required = true;
+		}
+	}
+	</script>
+	<%
 			// Check if the request was a POST request
 			if ("POST".equals(request.getMethod())) {
-				// If user clicks on the login button
-				if(request.getParameter("createAuction") != null){					
-					//boolean allFieldsFilled = true;
-
-					String shoeName = request.getParameter("shoeName");
+				// If user clicks on the createAuction button
+				if(request.getParameter("createAuction") != null){
+					boolean success = false;
+					ShoesAuction shoesAuction;
+					String shoeType = request.getParameter("shoeType");
+					String sellerUsername = username;
+					String name = request.getParameter("name");
 					String brand = request.getParameter("brand");
 					String color = request.getParameter("color");
 					String quality = request.getParameter("quality");
-					String size = request.getParameter("size");
-					String gender = request.getParameter("gender").substring(0, 1);
-					String closingDateTime = request.getParameter("closingDateTime");
-					String minBidIncrement = request.getParameter("minBidIncrement");
-					String hiddenMinPrice = request.getParameter("hiddenMinPrice");
-					String shoeType = request.getParameter("shoeType");
-					if (shoeType.equals("boots")) { // user chose boots
-						String height = (String) request.getParameter("height");
-						if (height == null | height == ""){
-							out.println("<p style='color:red;'>Fill in all the fields my dude thx</p>");
-						}
-						else{
-							out.println("we gonna make a boots auction now");
-							if(CreateAuction.createShoeListing(shoeName, brand, color, quality, size, gender, closingDateTime, minBidIncrement, hiddenMinPrice, shoeType, height, null, null, username)){
-								out.println("slay we created an auction");
-							}
-							else{
-								out.println("you screwed up somewhere. try again womp womp");
-							}
-						}
-						//out.println("<p style='color:black;'>Boots!</p>");
-						//out.println(request.getParameter("height"));
-						//if (height == null || height.equals("")) allFieldsFilled = false;
-					} else if (shoeType.equals("sandals")) {
-						String openToed = request.getParameter("openToed");
-						if (openToed == null || openToed.equals("")){
-							out.println("<p style='color:red;'>Fill in all the fields my dude thx</p>");
-						}
-						else{
-							out.println("we gonna make a sandals auction now");
-							if(CreateAuction.createShoeListing(shoeName, brand, color, quality, size, gender, closingDateTime, minBidIncrement, hiddenMinPrice, shoeType, null, openToed, null, username)){
-								out.println("slay we created an auction");
-							}
-							else{
-								out.println("you screwed up somewhere. try again womp womp");
-							}
-						}
-						//out.println("<p style='color:black;'>Sandals!</p>");
-						//openToed = request.getParameter("openToed");
-						//if (openToed == null || openToed.equals("")) allFieldsFilled = false;
-					} else if (shoeType.equals("sneakers")) {
-						String sport = (String) request.getParameter("sport");
-						if ((sport == null || sport.equals(""))){
-							out.println("<p style='color:red;'>Fill in all the fields my dude thx</p>");
-						}
-						else{
-							out.println("we gonna make a sneakers auction now");
-							if(CreateAuction.createShoeListing(shoeName, brand, color, quality, size, gender, closingDateTime, minBidIncrement, hiddenMinPrice, shoeType, null, null, sport, username)){
-								out.println("slay we created an auction");
-							}
-							else{
-								out.println("you screwed up somewhere. try again womp womp");
-							}
-						}
-						//out.println("<p style='color:black;'>Sneakers!</p>");
-						//sport = request.getParameter("sport");
-						//if (sport == null || sport.equals("")) allFieldsFilled = false;
+					float size = Float.parseFloat(request.getParameter("size"));
+					char gender = request.getParameter("gender").charAt(0);
+					LocalDateTime deadline = LocalDateTime.parse(request.getParameter("deadline"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+					double minBidIncrement = Double.parseDouble(request.getParameter("minBidIncrement"));
+					double secretMinPrice = Double.parseDouble(request.getParameter("secretMinPrice"));
+					if(shoeType.equals("sandals")){
+						boolean isOpenToed = Boolean.parseBoolean(request.getParameter("isOpenToed"));
+						shoesAuction = new SandalsAuction(sellerUsername, name, brand, color, quality, size, gender, deadline, minBidIncrement, secretMinPrice, isOpenToed);
+					} else if(shoeType.equals("sneakers")){
+						String sport = request.getParameter("sport");
+						shoesAuction = new SneakersAuction(sellerUsername, name, brand, color, quality, size, gender, deadline, minBidIncrement, secretMinPrice, sport);
+					} else { // if shoeType.equals("boots")
+						double height = Double.parseDouble(request.getParameter("height"));
+						shoesAuction = new BootsAuction(sellerUsername, name, brand, color, quality, size, gender, deadline, minBidIncrement, secretMinPrice, height);
 					}
-					//if (allFieldsFilled) {
-						//if (!CreateAuction.createShoeListing(shoeName, brand, color, quality, size, gender, closingDateTime, minBidIncrement, hiddenMinPrice, shoeType, height, openToed, sport, (String) session.getAttribute("username"))){
-							//out.println("<p style='color:black;'>Auction created.</p>");
-						//}
-						//else{
-							//out.println("<p style='color:black;'>Cannot create auction. Try again.</p>");
-						//}
-					//} else {
-						//out.println("<p style='color:red;'>Please fill in empty fields.</p>");
-					//}
-					else{
-						out.println("idk how you can get an error here but here we go!");
+					success = AuctionUtil.createShoesAuction(shoesAuction);
+					if(success){
+						out.println("<p style='color:green;'>Auction created successfully!</p>");
+					} else {
+						out.println("<p style='color:red;'>Failed to create auction. Please try again.</p>");
 					}
 				}
 			}
