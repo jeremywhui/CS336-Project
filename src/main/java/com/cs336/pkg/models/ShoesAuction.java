@@ -61,6 +61,37 @@ public abstract class ShoesAuction {
         this.currentPrice = 0;
     }
 
+    /**
+     * Constructor for ShoesAuction. This constructor is used when fetching the data from the database.
+     * @param shoesId         Unique identifier for the shoes
+     * @param sellerUsername  Username of the seller
+     * @param name            Name of the shoes
+     * @param brand           Brand of the shoes
+     * @param color           Color of the shoes
+     * @param quality         Quality of the shoes
+     * @param size            Size of the shoes
+     * @param gender          Gender of the shoes
+     * @param deadline        Deadline for the auction
+     * @param minBidIncrement Minimum increment for the bid
+     * @param secretMinPrice  Secret minimum price for the auction
+     * @param currentPrice    Current price of the auction
+     */
+    public ShoesAuction(int shoesId, String sellerUsername, String name, String brand, String color, String quality,
+            float size, char gender, LocalDateTime deadline, double minBidIncrement, double secretMinPrice, double currentPrice) {
+        this.shoesId = shoesId;
+        this.sellerUsername = sellerUsername;
+        this.name = name;
+        this.brand = brand;
+        this.color = color;
+        this.quality = quality;
+        this.size = size;
+        this.gender = gender;
+        this.deadline = deadline;
+        this.minBidIncrement = minBidIncrement;
+        this.secretMinPrice = secretMinPrice;
+        this.currentPrice = currentPrice;
+    }
+
     // Getter methods...
 
     public int getShoesId() {

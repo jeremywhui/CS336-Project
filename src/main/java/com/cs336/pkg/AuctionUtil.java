@@ -5,6 +5,8 @@ import com.cs336.pkg.models.SandalsAuction;
 import com.cs336.pkg.models.SneakersAuction;
 
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import com.cs336.pkg.models.BootsAuction;
 
@@ -89,4 +91,112 @@ public class AuctionUtil {
             }
         }
     }
+
+    /**
+     * Gets all the shoes auctions in the database of the given seller.
+     * 
+     * @param username The username of the seller.
+     * @return An ArrayList of ShoesAuction objects.
+     */
+    public static ArrayList<ShoesAuction> getShoesAuctionsBySeller(String username) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+        ArrayList<ShoesAuction> shoesAuctions = new ArrayList<>();
+        int shoesId;
+        // seller username is a parameter
+        String name;
+        String brand;
+        String color;
+        String quality;
+        float size;
+        char gender;
+        LocalDateTime deadline;
+        double minBidIncrement;
+        double secretMinPrice;
+        double currentPrice;
+        boolean isOpenToed;
+        String sport;
+        double height;
+
+        try {
+            String querySandals = "SELECT * FROM Shoes_Auction sa JOIN Sandals_Auction sda ON sa.shoes_id = sda.shoes_id WHERE sa.seller_username = ?";
+            String querySneakers = "SELECT * FROM Shoes_Auction sa JOIN Sneakers_Auction sna ON sa.shoes_id = sna.shoes_id WHERE sa.seller_username = ?";
+            String queryBoots = "SELECT * FROM Shoes_Auction sa JOIN Boots_Auction ba ON sa.shoes_id = ba.shoes_id WHERE sa.seller_username = ?";
+
+            PreparedStatement pstmtSandals = con.prepareStatement(querySandals);
+            PreparedStatement pstmtSneakers = con.prepareStatement(querySneakers);
+            PreparedStatement pstmtBoots = con.prepareStatement(queryBoots);
+
+            pstmtSandals.setString(1, username);
+            pstmtSneakers.setString(1, username);
+            pstmtBoots.setString(1, username);
+
+            ResultSet rsSandals = pstmtSandals.executeQuery();
+            while (rsSandals.next()) {
+                shoesId = rsSandals.getInt("shoes_id");
+                name = rsSandals.getString("name");
+                brand = rsSandals.getString("brand");
+                color = rsSandals.getString("color");
+                quality = rsSandals.getString("quality");
+                size = rsSandals.getFloat("size");
+                gender = rsSandals.getString("gender").charAt(0);
+                deadline = rsSandals.getTimestamp("deadline").toLocalDateTime();
+                minBidIncrement = rsSandals.getDouble("min_bid_increment");
+                secretMinPrice = rsSandals.getDouble("secret_min_price");
+                currentPrice = rsSandals.getDouble("current_price");
+                isOpenToed = rsSandals.getBoolean("is_open_toed");
+                shoesAuctions.add(new SandalsAuction(shoesId, username, name, brand, color, quality, size, gender,
+                        deadline, minBidIncrement, secretMinPrice, currentPrice, isOpenToed));
+            }
+
+            ResultSet rsSneakers = pstmtSneakers.executeQuery();
+            while (rsSneakers.next()) {
+                shoesId = rsSneakers.getInt("shoes_id");
+                name = rsSneakers.getString("name");
+                brand = rsSneakers.getString("brand");
+                color = rsSneakers.getString("color");
+                quality = rsSneakers.getString("quality");
+                size = rsSneakers.getFloat("size");
+                gender = rsSneakers.getString("gender").charAt(0);
+                deadline = rsSneakers.getTimestamp("deadline").toLocalDateTime();
+                minBidIncrement = rsSneakers.getDouble("min_bid_increment");
+                secretMinPrice = rsSneakers.getDouble("secret_min_price");
+                currentPrice = rsSneakers.getDouble("current_price");
+                sport = rsSneakers.getString("sport");
+                shoesAuctions.add(new SneakersAuction(shoesId, username, name, brand, color, quality, size, gender,
+                        deadline, minBidIncrement, secretMinPrice, currentPrice, sport));
+            }
+
+            ResultSet rsBoots = pstmtBoots.executeQuery();
+            while (rsBoots.next()) {
+                shoesId = rsBoots.getInt("shoes_id");
+                name = rsBoots.getString("name");
+                brand = rsBoots.getString("brand");
+                color = rsBoots.getString("color");
+                quality = rsBoots.getString("quality");
+                size = rsBoots.getFloat("size");
+                gender = rsBoots.getString("gender").charAt(0);
+                deadline = rsBoots.getTimestamp("deadline").toLocalDateTime();
+                minBidIncrement = rsBoots.getDouble("min_bid_increment");
+                secretMinPrice = rsBoots.getDouble("secret_min_price");
+                currentPrice = rsBoots.getDouble("current_price");
+                height = rsBoots.getDouble("height");
+                shoesAuctions.add(new BootsAuction(shoesId, username, name, brand, color, quality, size, gender,
+                        deadline, minBidIncrement, secretMinPrice, currentPrice, height));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+
+        return shoesAuctions;
+    }
+
 }

@@ -34,6 +34,33 @@ public class BootsAuction extends ShoesAuction {
         this.height = height;
     }
 
+    /**
+     * Constructor for BootsAuction. This constructor is used when fetching the
+     * data from the database.
+     * 
+     * @param shoesId         Unique identifier for the boots
+     * @param sellerUsername  Username of the seller
+     * @param name            Name of the boots
+     * @param brand           Brand of the boots
+     * @param color           Color of the boots
+     * @param quality         Quality of the boots
+     * @param size            Size of the boots
+     * @param gender          Gender of the boots
+     * @param deadline        Deadline for the auction
+     * @param minBidIncrement Minimum increment for the bid
+     * @param secretMinPrice  Secret minimum price for the auction
+     * @param currentPrice    Current price of the auction
+     * @param height          Height of the boots
+     */
+    public BootsAuction(int shoesId, String sellerUsername, String name, String brand, String color, String quality,
+            float size, char gender, LocalDateTime deadline, double minBidIncrement, double secretMinPrice, double currentPrice,
+            double height) {
+        super(shoesId, sellerUsername, name, brand, color, quality, size, gender, deadline, minBidIncrement,
+                secretMinPrice, currentPrice);
+        this.height = height;
+
+    }
+
     public double getHeight() {
         return height;
     }

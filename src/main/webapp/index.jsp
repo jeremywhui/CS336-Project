@@ -38,7 +38,7 @@
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
         <h1>Home Page</h1>
         <p>Welcome, <%= session.getAttribute("username")%>!</p>
-        <h3>Post Shoes for Sale!</h3>
+        <h2>Post Shoes for Sale!</h2>
         <form method="post">
 			<label for="name">Name:</label><br>
 			<input type="text" id="name" name="name" maxlength="50" required><br>
@@ -151,6 +151,33 @@
 						out.println("<p style='color:red;'>Failed to create auction. Please try again.</p>");
 					}
 				}
+			}
+		%>
+		<h2>Your Auctions</h2>
+		<%
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			ArrayList<ShoesAuction> auctions = AuctionUtil.getShoesAuctionsBySeller(username);
+			if(auctions.size() == 0){
+				out.println("<p>You have no auctions.</p>");
+			} else {
+		%>
+			<table>
+				<tr>
+					<th>Type</th>
+					<th>Name</th>
+					<th>Brand</th>
+					<th>Deadline</th>
+				</tr>
+				<% for(ShoesAuction auction : auctions) { %>
+					<tr>
+						<td><%= auction.getClass().getSimpleName().replace("Auction", "") %></td>
+						<td><%= auction.getName() %></td>
+						<td><%= auction.getBrand() %></td>
+						<td><%= auction.getDeadline().format(formatter) %></td>
+					</tr>
+				<% } %>
+			</table>
+		<%
 			}
 		%>
     </body>
