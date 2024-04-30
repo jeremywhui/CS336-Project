@@ -194,13 +194,13 @@ public class AuctionUtil {
      * 
      * @return
      */
-    public static ArrayList<String[]> displayShoesAuction() {
+    public static ArrayList<String[]> displayShoesAuction(String sortBy, String ascDesc) {
         ArrayList<String[]> res = new ArrayList<>();
         ApplicationDB db = new ApplicationDB();
         Connection con = db.getConnection();
 
         try (Statement stmt = con.createStatement()) {
-            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) ORDER BY shoes_id";
+            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) ORDER BY " + sortBy + " " + ascDesc;
             PreparedStatement pstmt = con.prepareStatement(query);
             ResultSet result = pstmt.executeQuery();
  
@@ -221,5 +221,35 @@ public class AuctionUtil {
             }
         }
         return res;
+    }
+
+    public static String calculateMinBidPrice(int shoeID) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try (Statement stmt = con.createStatement()) {
+            String query = "SELECT min_bid_increment + current_price FROM Shoes_auction WHERE shoes_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, Integer.toString(shoeID));
+            ResultSet result = pstmt.executeQuery();
+ 
+            if (result.next()) {
+                return result.getString("min_bid_increment + current_price");
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
+        
     }
 }
