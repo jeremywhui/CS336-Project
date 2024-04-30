@@ -205,7 +205,7 @@ public class AuctionUtil {
             ResultSet result = pstmt.executeQuery();
  
             while (result.next()) { // while there are results
-                res.add(new String[] {Integer.toString(result.getInt("shoes_id")), result.getString("seller_username"),result.getString("brand"), result.getString("color"), result.getString("quality"), Float.toString(result.getFloat("size")), result.getString("gender"), result.getString("deadline"), Double.toString(result.getDouble("min_bid_increment")), Double.toString(result.getDouble("current_price")), Double.toString(result.getDouble("height")), Boolean.toString(result.getBoolean("is_open_toed")), result.getString("sport")}); // get answer from current row
+                res.add(new String[] {Integer.toString(result.getInt("shoes_id")), result.getString("seller_username"), result.getString("name"), result.getString("brand"), result.getString("color"), result.getString("quality"), Float.toString(result.getFloat("size")), result.getString("gender"), result.getString("deadline"), Double.toString(result.getDouble("min_bid_increment")), Double.toString(result.getDouble("current_price")), Double.toString(result.getDouble("height")), Boolean.toString(result.getBoolean("is_open_toed")), result.getString("sport")}); // get answer from current row
             }
             
         } catch (SQLException e) {

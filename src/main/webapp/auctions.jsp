@@ -29,7 +29,11 @@
 		    }
 		    tr:first-child td{
 		        height: 50px;
+                background-color: Grey
 		    }
+            tr:nth-child(even) { 
+                background-color: Lightgreen; 
+            } 
 		</style>
         
         <table>
@@ -70,7 +74,7 @@
                 String sport = res.get(i)[13];
             %>
             <tr>
-                <td><%=shoeId %></td>
+                <td><%=shoeID %></td>
                 <td><%=sellerUsername %></td>
                 <td><%=name %></td>
                 <td><%=brand %></td>
