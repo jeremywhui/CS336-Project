@@ -241,12 +241,42 @@
     				<% } %>
     			</table>
     		<%
-    			}
-    		out.println("hey");
-        
+    			}        
         }
+        
         else if (QuestionUtil.checkUser(username) == 1){ // user is an admin
-        	out.println("admin");
+        	out.println("admin"); %>
+        
+        	<h2>All Auctions</h2>
+    		<%
+    			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    			ArrayList<ShoesAuction> auctions = AuctionUtil.showAllAuctions();
+    			if(auctions.size() == 0){
+    				out.println("<p>You have no auctions.</p>");
+    			} else {
+    		%>
+    			<table>
+    				<tr>
+    					<th>Shoes ID</th>
+    					<th>Username</th>
+    					<th>Type</th>
+    					<th>Name</th>
+    					<th>Brand</th>
+    					<th>Deadline</th>
+    				</tr>
+    				<% for(ShoesAuction auction : auctions) { %>
+    					<tr>
+    						<td><%= auction.getShoesId() %></td>
+    						<td><%= auction.getSellerUsername() %></td>
+    						<td><%= auction.getClass().getSimpleName().replace("Auction", "") %></td>
+    						<td><%= auction.getName() %></td>
+    						<td><%= auction.getBrand() %></td>
+    						<td><%= auction.getDeadline().format(formatter) %></td>
+    					</tr>
+    				<% } %>
+    			</table>
+    		<%
+    			}
         }
         else { // idk how but you messed something up
         	out.println("<p style='color:red;'> Error somehow, frankly idk how you made it to this </p>");
