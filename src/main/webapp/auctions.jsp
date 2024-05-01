@@ -50,20 +50,48 @@
                 background-color: Lightgreen; 
             } 
 		</style>
-        
-        <h2>Sort and search for shoes:</h2>
+
+        <h2>Place a Manual Bid</h2>
         <form method="POST">
-            <%-- <label for="shoeID">Shoe ID:</label><br>
-			<input type="number" id="shoeID" name="shoeID" step="1" onchange="calculateMinBidPrice(this.value)" required><br>
+            <label for="shoes_id">Shoe ID:</label><br>
+			<input type="number" id="shoeID" name="shoeID" step="1" required><br>
             <label for="bid">Bid:</label><br>
-			<input type="number" id="bid" name="bid" step="0.01" min="" max="9999999999.99" required><br> --%>
+			<input type="number" id="bid" name="bid" step="0.01" min="0.01" max="9999999999.99" required><br>
+            <br>
+            <input type="submit" name="placeBid" value="Place Bid">
+        </form>
+
+        <%
+            if ("POST".equals(request.getMethod())) {
+                if (request.getParameter("placeBid") != null) {
+                    int shoeID = Integer.parseInt(request.getParameter("shoeID"));
+                    float bid = Float.parseFloat(request.getParameter("bid"));
+                    if (AuctionUtil.validateBidAmount(shoeID, bid)) {
+                        out.println("<p style='color:green'>Bid placed successfully!</p>");
+                    } else {
+                        out.println("<p style='color:red'>Bid could not be placed, please make sure shoeID is correct and the bid is at least the current price + bid increment.</p>");
+                    }
+                } 
+            }
+        %>
+        
+        <h2>Sort and Search for Shoes:</h2>
+        <form method="POST">
             <label for="sortBy">Sort by:</label><br>
             <select id="sortBy" name="sortBy" required>
 				<option value="shoes_id">Shoe ID</option>
-				<option value="name">Name</option>
+                <option value="seller_username">Seller Username</option>
+                <option value="name">Name</option>
+                <option value="brand">Brand</option>
+                <option value="color">Color</option>
                 <option value="quality">Quality</option>
+                <option value="size">Size</option>
+                <option value="gedner">Gender</option>
 				<option value="deadline">Deadline</option>
                 <option value="current_price">Current Price</option>
+                <option value="height">Height</option>
+                <option value="is_open_toed">Is Open Toed</option>
+                <option value="sport">Sport</option>
 			</select><br>
             <label for="ascDesc">Ascending/Descending:</label><br>
             <select id="ascDesc" name="ascDesc" required>
@@ -143,32 +171,7 @@
 		}
 	}
 	</script>
-
-        <%-- <script>
-        function calculateMinBidPrice(shoeID) {
-            document.getElementById('bid').min = <%= AuctionUtil.calculateMinBidPrice(shoeID) %>
-        }
-        </script> --%>
-
-        <h2> All Auctions </h2>
-
-        <table>
-            <tr>
-                <td><h3>Shoe ID</h3></td>
-                <td><h3>Seller Username</h3></td>
-                <td><h3>Name</h3></td>
-                <td><h3>Brand</h3></td>
-                <td><h3>Color</h3></td>
-                <td><h3>Quality</h3></td>
-                <td><h3>Size</h3></td>
-                <td><h3>Gender</h3></td>
-                <td><h3>Deadline</h3></td>
-                <td><h3>Min Bid Increment</h3></td>
-                <td><h3>Current Price</h3></td>
-                <td><h3>Height</h3></td>
-                <td><h3>Is Open Toed</h3></td>
-                <td><h3>Sport</h3></td>
-            </tr>
+            <h2> All Auctions </h2>
             <%
             if ("POST".equals(request.getMethod())) {
 				// If user clicks on the login button
@@ -185,17 +188,29 @@
 					float searchSize = request.getParameter("size").equals("") ? -1.0f : Float.parseFloat(request.getParameter("size"));
 					char searchGender = request.getParameter("gender").equals("") ? 'N' : request.getParameter("gender").charAt(0);
 					LocalDateTime searchDeadline = request.getParameter("deadline").equals("") ? null : LocalDateTime.parse(request.getParameter("deadline"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-					// if(shoeType.equals("sandals")){
-					// 	boolean isOpenToed = Boolean.parseBoolean(request.getParameter("isOpenToed"));
-					// } else if(shoeType.equals("sneakers")){
-					// 	String sport = request.getParameter("sport");
-					// 	shoesAuction = new SneakersAuction(sellerUsername, name, brand, color, quality, size, gender, deadline, minBidIncrement, secretMinPrice, sport);
-					// } else { // if shoeType.equals("boots")
-					// 	double height = Double.parseDouble(request.getParameter("height"));
-					// 	shoesAuction = new BootsAuction(sellerUsername, name, brand, color, quality, size, gender, deadline, minBidIncrement, secretMinPrice, height);
-					// }
+                    
                     ArrayList<String[]> res = AuctionUtil.displayShoesAuction(sortBy, ascDesc, searchShoeType, searchSellerUsername, searchName, searchBrand, searchColor, searchQuality, searchSize, searchGender, searchDeadline);
-					if (res != null) {
+					if (res != null && res.size() != 0) {
+            %>
+                        <table>
+                            <tr>
+                                <td><h3>Shoe ID</h3></td>
+                                <td><h3>Seller Username</h3></td>
+                                <td><h3>Name</h3></td>
+                                <td><h3>Brand</h3></td>
+                                <td><h3>Color</h3></td>
+                                <td><h3>Quality</h3></td>
+                                <td><h3>Size</h3></td>
+                                <td><h3>Gender</h3></td>
+                                <td><h3>Deadline</h3></td>
+                                <td><h3>Min Bid Increment</h3></td>
+                                <td><h3>Current Price</h3></td>
+                                <td><h3>Shoe Type</h3></td>
+                                <td><h3>Height</h3></td>
+                                <td><h3>Is Open Toed</h3></td>
+                                <td><h3>Sport</h3></td>
+                            </tr>
+                <%
                         for (int i = 0; i < res.size(); i++) {
                             String shoeID = res.get(i)[0];
                             String sellerUsername = res.get(i)[1];
@@ -208,9 +223,10 @@
                             String deadline = res.get(i)[8];
                             String minBidIncrement = res.get(i)[9];
                             String currentPrice = res.get(i)[10];
-                            String height = res.get(i)[11];
-                            String isOpenToed = res.get(i)[12];
-                            String sport = res.get(i)[13];
+                            String shoeType = res.get(i)[11];
+                            String height = res.get(i)[12];
+                            String isOpenToed = res.get(i)[13];
+                            String sport = res.get(i)[14];
                 %>
             <tr>
                 <td><%=shoeID %></td>
@@ -224,6 +240,7 @@
                 <td><%=deadline %></td>
                 <td><%=minBidIncrement %></td>
                 <td><%=currentPrice %></td>
+                <td><%=shoeType %></td>
                 <td><%=height %></td>
                 <td><%=isOpenToed %></td>
                 <td><%=sport %></td>
@@ -232,7 +249,7 @@
                         }
 					}
 					else{
-						out.println("<p style='color:red;'>No shoes found</p>");
+						out.println("<p style='color:red'>No shoes found.</p>");
 					}
 				}
 			}

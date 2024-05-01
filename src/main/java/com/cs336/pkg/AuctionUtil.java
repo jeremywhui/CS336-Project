@@ -202,7 +202,7 @@ public class AuctionUtil {
 
         try (Statement stmt = con.createStatement()) {
             boolean firstCondition = true;
-            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) ";
+            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, IF(shoes_id IN (SELECT shoes_id FROM sandals_auction), 'Sandals', IF(shoes_id IN (SELECT shoes_id FROM sneakers_auction), 'Sneakers', 'Boots')) AS shoe_type, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) ";
             if (!shoeType.equals("")) {
                 query += firstCondition ? "WHERE " : "AND ";
                 query += "shoes_id IN (SELECT shoes_id FROM " + shoeType + "_auction) ";
@@ -243,6 +243,21 @@ public class AuctionUtil {
                 query += "gender = '" + Character.toString(gender) + "' ";
                 firstCondition = false;
             }
+            // if (gender != 'N') {
+            //     query += firstCondition ? "WHERE " : "AND ";
+            //     query += "gender = '" + Character.toString(gender) + "' ";
+            //     firstCondition = false;
+            // }
+            // if (gender != 'N') {
+            //     query += firstCondition ? "WHERE " : "AND ";
+            //     query += "gender = '" + Character.toString(gender) + "' ";
+            //     firstCondition = false;
+            // }
+            // if (gender != 'N') {
+            //     query += firstCondition ? "WHERE " : "AND ";
+            //     query += "gender = '" + Character.toString(gender) + "' ";
+            //     firstCondition = false;
+            // }
             
             query += "ORDER BY " + sortBy + " " + ascDesc;
             System.out.println(query);
@@ -262,8 +277,9 @@ public class AuctionUtil {
                     result.getString("deadline"), 
                     "$" + result.getString("min_bid_increment"), 
                     "$" + result.getString("current_price"), 
+                    result.getString("shoe_type"),
                     result.getString("height") != null ? result.getString("height") : "N/A", 
-                    result.getString("is_open_toed") != null ? Boolean.toString(result.getBoolean("is_open_toed")) : "N/A", 
+                    result.getString("is_open_toed") != null ? Boolean.toString(result.getBoolean("is_open_toed")).substring(0,1).toUpperCase() + Boolean.toString(result.getBoolean("is_open_toed")).substring(1) : "N/A", 
                     result.getString("sport") != null ? result.getString("sport") : "N/A"}); // get answer from current row
             }
             
@@ -280,35 +296,6 @@ public class AuctionUtil {
             }
         }
         return res;
-    }
-
-    public static String calculateMinBidPrice(int shoeID) {
-        ApplicationDB db = new ApplicationDB();
-        Connection con = db.getConnection();
-
-        try (Statement stmt = con.createStatement()) {
-            String query = "SELECT min_bid_increment + current_price FROM Shoes_auction WHERE shoes_id = ?";
-            PreparedStatement pstmt = con.prepareStatement(query);
-            pstmt.setString(1, Integer.toString(shoeID));
-            ResultSet result = pstmt.executeQuery();
- 
-            if (result.next()) {
-                return result.getString("min_bid_increment + current_price");
-            }
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return null;
     }
     
     /**
@@ -469,7 +456,57 @@ public class AuctionUtil {
         }
         return false;
     }
+
+    public static boolean validateBidAmount(int shoeID, float bid) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try (Statement stmt = con.createStatement()) {
+        	String query = "SELECT current_price + min_bid_increment minBid FROM Shoes_Auction WHERE shoes_ID = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, shoeID);
+            ResultSet result = pstmt.executeQuery();
+            if (result.next()) {
+                return bid >= result.getFloat("minBid");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
+    }
     
-    
+    // public static boolean placeBid(int shoeID, float bid) {
+    //     ApplicationDB db = new ApplicationDB();
+    //     Connection con = db.getConnection();
+
+    //     try (Statement stmt = con.createStatement()) {
+    //     	String query = "SELECT current_price + min_bid_increment minBid FROM Shoes_Auction WHERE shoes_ID = ?";
+    //         PreparedStatement pstmt = con.prepareStatement(query);
+    //         pstmt.setInt(1, shoeID);
+    //         ResultSet result = pstmt.executeQuery();
+    //         if (result.next()) {
+    //             return bid >= result.getFloat("minBid");
+    //         }
+    //     } catch (SQLException e) {
+    //         e.printStackTrace();
+    //     } finally {
+    //         if (con != null) {
+    //             try {
+    //                 con.close();
+    //             } catch (SQLException e) {
+    //                 e.printStackTrace();
+    //             }
+    //         }
+    //     }
+    //     return false;
+    // }
     
 }
