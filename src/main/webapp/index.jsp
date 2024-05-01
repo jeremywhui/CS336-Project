@@ -22,7 +22,10 @@
             }
         	String username = (String)session.getAttribute("username");
         %>
-		<script>
+        <jsp:include page="/WEB-INF/components/navbar.jsp" />
+        <%
+        if (QuestionUtil.checkUser(username) == 3){ // user is an end user %>
+        	<script>
 		window.onload = function() {
 			var now = new Date();
 			now.setDate(now.getDate() + 1);
@@ -35,7 +38,6 @@
 			document.getElementById('deadline').min = minDateTime;
 		}
 		</script>
-        <jsp:include page="/WEB-INF/components/navbar.jsp" />
         <h1>Home Page</h1>
         <p>Welcome, <%= session.getAttribute("username")%>!</p>
         <h2>Post Shoes for Sale!</h2>
@@ -181,5 +183,75 @@
 		<%
 			}
 		%>
+		
+        <%}
+        
+        else if (QuestionUtil.checkUser(username) == 2){ // user is a customer rep %>
+        	<br>
+        	<form method="post">
+                <h4>Shoes ID Number:</h4>
+                <input type = "number" name = "shoes_id" pattern="\d+" required>
+                <br>
+                <br><input type="submit" name="deleteAuctionSubmit" value="Delete Auction">
+                <br>
+            </form>    
+            <br>
+        	
+        	<%
+        	if ("POST".equals(request.getMethod())) {
+                int shoes_id = Integer.parseInt(request.getParameter("shoes_id"));
+                if (!AuctionUtil.existsInTable(shoes_id)){ // Checks shoes_id is a valid shoes_id
+                    out.println("<p style='color:red;'>Not a valid Auction</p>");
+                }
+                else if (AuctionUtil.deleteAuction(shoes_id)){ // deletes auction from databse
+                    response.sendRedirect("index");
+                    out.println("success");
+                }
+                else{
+                        out.println("<p style='color:red;'>Error Try again.</p>");
+                }
+            }
+        	%>
+        	<h2>All Auctions</h2>
+    		<%
+    			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    			ArrayList<ShoesAuction> auctions = AuctionUtil.showAllAuctions();
+    			if(auctions.size() == 0){
+    				out.println("<p>You have no auctions.</p>");
+    			} else {
+    		%>
+    			<table>
+    				<tr>
+    					<th>Shoes ID</th>
+    					<th>Username</th>
+    					<th>Type</th>
+    					<th>Name</th>
+    					<th>Brand</th>
+    					<th>Deadline</th>
+    				</tr>
+    				<% for(ShoesAuction auction : auctions) { %>
+    					<tr>
+    						<td><%= auction.getShoesId() %></td>
+    						<td><%= auction.getSellerUsername() %></td>
+    						<td><%= auction.getClass().getSimpleName().replace("Auction", "") %></td>
+    						<td><%= auction.getName() %></td>
+    						<td><%= auction.getBrand() %></td>
+    						<td><%= auction.getDeadline().format(formatter) %></td>
+    					</tr>
+    				<% } %>
+    			</table>
+    		<%
+    			}
+    		out.println("hey");
+        
+        }
+        else if (QuestionUtil.checkUser(username) == 1){ // user is an admin
+        	out.println("admin");
+        }
+        else { // idk how but you messed something up
+        	out.println("<p style='color:red;'> Error somehow, frankly idk how you made it to this </p>");
+        }
+        %>
+		
     </body>
 </html>
