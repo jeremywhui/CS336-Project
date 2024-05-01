@@ -194,18 +194,76 @@ public class AuctionUtil {
      * 
      * @return
      */
-    public static ArrayList<String[]> displayShoesAuction(String sortBy, String ascDesc) {
+    public static ArrayList<String[]> displayShoesAuction(String sortBy, String ascDesc, String shoeType, String sellerUsername, String name, String brand, String color, String quality, float size, char gender, LocalDateTime deadline) {
         ArrayList<String[]> res = new ArrayList<>();
         ApplicationDB db = new ApplicationDB();
         Connection con = db.getConnection();
 
         try (Statement stmt = con.createStatement()) {
-            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) ORDER BY " + sortBy + " " + ascDesc;
+            boolean firstCondition = true;
+            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) ";
+            if (!shoeType.equals("")) {
+                query += firstCondition ? "WHERE " : "AND ";
+                query += "shoes_id IN (SELECT shoes_id FROM " + shoeType + "_auction) ";
+                firstCondition = false;
+            }
+            if (!sellerUsername.equals("")) {
+                query += firstCondition ? "WHERE " : "AND ";
+                query += "seller_username LIKE '%" + sellerUsername + "%' ";
+                firstCondition = false;
+            }
+            if (!name.equals("")) {
+                query += firstCondition ? "WHERE " : "AND ";
+                query += "name LIKE '%" + name + "%' ";
+                firstCondition = false;
+            }
+            if (!brand.equals("")) {
+                query += firstCondition ? "WHERE " : "AND ";
+                query += "brand LIKE '%" + brand + "%' ";
+                firstCondition = false;
+            }
+            if (!color.equals("")) {
+                query += firstCondition ? "WHERE " : "AND ";
+                query += "color LIKE '%" + color + "%' ";
+                firstCondition = false;
+            }
+            if (!quality.equals("")) {
+                query += firstCondition ? "WHERE " : "AND ";
+                query += "quality LIKE '%" + quality + "%' ";
+                firstCondition = false;
+            }
+            if (size != -1.0f) {
+                query += firstCondition ? "WHERE " : "AND ";
+                query += "size = " + Float.toString(size) + " ";
+                firstCondition = false;
+            }
+            if (gender != 'N') {
+                query += firstCondition ? "WHERE " : "AND ";
+                query += "gender = '" + Character.toString(gender) + "' ";
+                firstCondition = false;
+            }
+            
+            query += "ORDER BY " + sortBy + " " + ascDesc;
+            System.out.println(query);
             PreparedStatement pstmt = con.prepareStatement(query);
             ResultSet result = pstmt.executeQuery();
  
             while (result.next()) { // while there are results
-                res.add(new String[] {Integer.toString(result.getInt("shoes_id")), result.getString("seller_username"), result.getString("name"), result.getString("brand"), result.getString("color"), result.getString("quality"), Float.toString(result.getFloat("size")), result.getString("gender"), result.getString("deadline"), Double.toString(result.getDouble("min_bid_increment")), Double.toString(result.getDouble("current_price")), Double.toString(result.getDouble("height")), Boolean.toString(result.getBoolean("is_open_toed")), result.getString("sport")}); // get answer from current row
+                res.add(new String[] {
+                    result.getString("shoes_id"), 
+                    result.getString("seller_username"), 
+                    result.getString("name"), 
+                    result.getString("brand"),
+                    result.getString("color"), 
+                    result.getString("quality"), 
+                    result.getString("size"), 
+                    result.getString("gender"), 
+                    result.getString("deadline"), 
+                    "$" + result.getString("min_bid_increment"), 
+                    "$" + result.getString("current_price"), 
+                    result.getString("height") != null ? result.getString("height") : "N/A", 
+                    result.getString("is_open_toed") != null ? Boolean.toString(result.getBoolean("is_open_toed")) : "N/A", 
+                    result.getString("sport") != null ? result.getString("sport") : "N/A"}); // get answer from current row
             }
             
         } catch (SQLException e) {

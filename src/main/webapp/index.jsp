@@ -85,11 +85,11 @@
 			</div>
 			<div id="sneakersFields" style="display: none;">
 				<label for="sport">Sport:</label><br>
-				<input type="text" id="sport" name="sport" maxlength="20"><br>
+				<input type="text" id="sport" name="sport" maxlength="20" required><br>
 			</div>
 			<div id="bootsFields" style="display: none;">
 				<label for="height">Height:</label><br>
-				<input type="number" id="height" name="height" step="0.1"><br>
+				<input type="number" id="height" name="height" min="0.1" step="0.1" required><br>
 			</div>
 			<br>
 			<input type="submit" name="createAuction" value="Create Auction">
