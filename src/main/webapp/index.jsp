@@ -244,9 +244,7 @@
     			}        
         }
         
-        else if (QuestionUtil.checkUser(username) == 1){ // user is an admin
-        	out.println("admin"); %>
-        
+        else if (QuestionUtil.checkUser(username) == 1){ // user is an admin %>        
         	<h2>All Auctions</h2>
     		<%
     			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
