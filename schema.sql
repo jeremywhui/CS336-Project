@@ -49,6 +49,15 @@ CREATE TABLE Sneakers_Auction(
     PRIMARY KEY (shoes_id),
     FOREIGN KEY (shoes_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE
 );
+INSERT INTO Shoes_Auction VALUES 
+(1,'test','test','test','blue','New',3,'F','2024-04-29 23:59:00',0.01,20.00,0.00),
+(2,'test','test2','test2','red','New',9,'F','2024-04-30 23:59:00',0.01,20.00,0.00),
+(3,'test','test3','test3','green','Refurbished',10,'M','2024-04-30 19:43:00',0.01,12.00,0.00),
+(4,'test','Expensive Shoes','Expensive Brand','gold','New',10,'U','2024-05-02 23:59:00',5.00,20.00,0.00);
+
+INSERT INTO Boots_Auction VALUES (1,3);
+INSERT INTO Sandals_Auction VALUES (2,0);
+INSERT INTO Sneakers_Auction VALUES (3,'Basketball'),(4,'Tennis');
 
 CREATE TABLE Alert(
     gender CHAR(1),
