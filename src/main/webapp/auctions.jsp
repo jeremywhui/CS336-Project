@@ -77,6 +77,7 @@
         
         <h2>Sort and Search for Shoes:</h2>
         <form method="POST">
+            <b>Sorting (order rows in auction table)</b><br>
             <label for="sortBy">Sort by:</label><br>
             <select id="sortBy" name="sortBy" required>
 				<option value="shoes_id">Shoe ID</option>
@@ -99,6 +100,7 @@
 				<option value="desc">Descending</option>
 			</select><br>
             <br>
+            <b>Searching (looks if keyword is contained in text columns)</b><br>
             <label for="sellerName">Seller Name:</label><br>
             <input type="text" id="sellerName" name="sellerName" maxLength="100"><br>
 			<label for="name">Name:</label><br>
