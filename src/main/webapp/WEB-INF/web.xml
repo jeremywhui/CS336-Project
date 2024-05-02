@@ -78,4 +78,12 @@
       <servlet-name>LogoutServlet</servlet-name>
       <url-pattern>/logout</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>AuctionServlet</servlet-name>
+    <jsp-file>/auction.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+      <servlet-name>AuctionServlet</servlet-name>
+      <url-pattern>/auction</url-pattern>
+  </servlet-mapping>
 </web-app>

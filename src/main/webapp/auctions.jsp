@@ -54,7 +54,7 @@
         <h2>Place a Manual Bid</h2>
         <form method="POST">
             <label for="shoes_id">Shoe ID:</label><br>
-			<input type="number" id="shoeID" name="shoeID" step="1" required><br>
+			<input type="number" id="shoesId" name="shoesId" step="1" required><br>
             <label for="bid">Bid:</label><br>
 			<input type="number" id="bid" name="bid" step="0.01" min="0.01" max="9999999999.99" required><br>
             <br>
@@ -64,12 +64,12 @@
         <%
             if ("POST".equals(request.getMethod())) {
                 if (request.getParameter("placeBid") != null) {
-                    int shoeID = Integer.parseInt(request.getParameter("shoeID"));
+                    int shoesId = Integer.parseInt(request.getParameter("shoesId"));
                     float bid = Float.parseFloat(request.getParameter("bid"));
-                    if (AuctionUtil.validateBidAmount(shoeID, bid)) {
+                    if (AuctionUtil.validateBidAmount(shoesId, bid)) {
                         out.println("<p style='color:green'>Bid placed successfully!</p>");
                     } else {
-                        out.println("<p style='color:red'>Bid could not be placed, please make sure shoeID is correct and the bid is at least the current price + bid increment.</p>");
+                        out.println("<p style='color:red'>Bid could not be placed, please make sure shoesId is correct and the bid is at least the current price + bid increment.</p>");
                     }
                 } 
             }
@@ -196,7 +196,7 @@
             %>
                         <table>
                             <tr>
-                                <td><h3>Shoe ID</h3></td>
+                                <td><h3>Shoes ID</h3></td>
                                 <td><h3>Seller Username</h3></td>
                                 <td><h3>Name</h3></td>
                                 <td><h3>Brand</h3></td>
@@ -214,7 +214,7 @@
                             </tr>
                 <%
                         for (int i = 0; i < res.size(); i++) {
-                            String shoeID = res.get(i)[0];
+                            String shoesId = res.get(i)[0];
                             String sellerUsername = res.get(i)[1];
                             String name = res.get(i)[2];
                             String brand = res.get(i)[3];
@@ -231,7 +231,7 @@
                             String sport = res.get(i)[14];
                 %>
             <tr>
-                <td><%=shoeID %></td>
+                <td><a href="auction?shoesId=<%= shoesId %>">Auction #<%= shoesId %></a></td>
                 <td><%=sellerUsername %></td>
                 <td><%=name %></td>
                 <td><%=brand %></td>
