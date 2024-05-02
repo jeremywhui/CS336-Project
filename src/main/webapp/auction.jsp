@@ -7,6 +7,7 @@
 <%@ page import="com.cs336.pkg.models.BootsAuction" %>
 <%@ page import="com.cs336.pkg.models.SneakersAuction" %>
 <%@ page import="com.cs336.pkg.models.Bid" %>
+<%@ page import="com.cs336.pkg.models.AutoBid" %>
 <%@ page import="java.time.LocalDateTime" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 
@@ -65,6 +66,7 @@
                         double currentMinNextBid = BidUtil.getMinBidAmount(shoesId);
 
                         ArrayList<Bid> bidHistory = BidUtil.getBidHistory(shoesId);
+                        AutoBid userAutoBid = BidUtil.getAutoBid(username, shoesId);
                 %>
                         <h2>Shoes Details</h2>
                         <p>Seller Username: <%= sellerUsername %></p>
@@ -76,6 +78,7 @@
                         <p>Gender: <%= gender %></p>
                         <p>Deadline: <%= deadline %></p>
                         <p>Current Highest Bid: <%= currentHighestBid %></p>
+                        <p>Minimum Bid Increment: <%= minBidIncrement%></p>
                         <p>Minimum Next Bid: <%= currentMinNextBid %></p>
 
                         <h2>Bid History</h2>
@@ -94,17 +97,32 @@
                             <% } %>
                         </table>
 
+                        <h2>Your Automatic Bid (if exits)</h2>
+                        <% if (userAutoBid != null) { %>
+                        <table>
+                            <tr>
+                                <th>Bid Increment</th>
+                                <th>Bid Maximum</th>
+                            </tr>
+                            
+                                <tr>
+                                    <td><%= userAutoBid.getBidIncrement() %></td>
+                                    <td><%= userAutoBid.getBidMaximum() %></td>
+                                </tr>
+                        </table>
+                         <% } %>
+
                         <h2>Place a Manual Bid</h2>
                         <form method="POST">
                             <label for="bid">Bid:</label><br>
                             <input type="number" id="bid" name="bid" step="0.01" min="<%= currentMinNextBid %>" max="9999999999.99" required><br>
                             <br>
-                            <input type="submit" name="placeBid" value="Place Bid">
+                            <input type="submit" name="placeManualBid" value="Place Bid">
                         </form>
 
                         <%
                             if ("POST".equals(request.getMethod())) {
-                                if (request.getParameter("placeBid") != null) {
+                                if (request.getParameter("placeManualBid") != null) {
                                     float bidAmount = Float.parseFloat(request.getParameter("bid"));
                                     Bid bid = new Bid(shoesId, username, LocalDateTime.now(), bidAmount);
                                     if (bidAmount >= currentMinNextBid) {
@@ -115,6 +133,33 @@
                                         }
                                     } else {
                                         out.println("<p style='color: red;'>Bid amount must be greater than or equal to the current minimum next bid amount.</p>"); // should never be displayed
+                                    }
+                                } 
+                            }
+                        %>
+                        <h2>Place an Automatic Bid</h2>
+                        <form method="POST">
+                            <label for="bid">Bid Increment:</label><br>
+                            <input type="number" id="bidIncrement" name="bidIncrement" step="0.01" min="<%= minBidIncrement %>" max="9999999999.99" required><br>
+                            <label for="bid">Bid Maximum:</label><br>
+                            <input type="number" id="bidMaximum" name="bidMaximum" step="0.01" min="<%= currentMinNextBid %>" max="9999999999.99" required><br>
+                            <br>
+                            <input type="submit" name="setAutoBid" value="Set Automatic Bid">
+                        </form>
+                        <%
+                        if ("POST".equals(request.getMethod())) {
+                                if (request.getParameter("setAutoBid") != null) {
+                                    float bidIncrement = Float.parseFloat(request.getParameter("bidIncrement"));
+                                    float bidMaximum = Float.parseFloat(request.getParameter("bidMaximum"));
+                                    AutoBid bid = new AutoBid(shoesId, username, bidIncrement, bidMaximum);
+                                    if (bidIncrement >= minBidIncrement && bidMaximum >= currentMinNextBid) {
+                                        if(BidUtil.setAutoBid(bid)) {
+                                            response.sendRedirect("auction?shoesId=" + shoesId);
+                                        } else {
+                                            out.println("<p style='color: red;'>Failed to place automatic bid.</p>");
+                                        }
+                                    } else {
+                                        out.println("<p style='color: red;'>Bid increment must be greater than or equal to the minimum bid increment, and the bid maximum must be greater than or equal to the next bid amount.</p>"); // should never be displayed
                                     }
                                 } 
                             }

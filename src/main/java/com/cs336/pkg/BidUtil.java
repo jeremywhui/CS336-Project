@@ -7,8 +7,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
+import com.cs336.pkg.models.AutoBid;
 import com.cs336.pkg.models.Bid;
 
 public class BidUtil {
@@ -44,6 +46,33 @@ public class BidUtil {
             }
         }
         return maxBidAmount;
+    }
+
+    public static String getCurrentWinner(int shoesId) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+        String winner = null;
+
+        try (Statement stmt = con.createStatement()) {
+            String query = "SELECT bidder_username FROM Bid WHERE shoes_id = ? HAVING bid_amount = MAX(bid_amount)";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, shoesId);
+            ResultSet result = pstmt.executeQuery();
+            if (result.next()) {
+                winner = result.getString("bidder_username");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return winner;
     }
 
     /**
@@ -110,7 +139,10 @@ public class BidUtil {
             pstmt.setDouble(4, bid.getBidAmount());
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                success = true;
+                if (bid.getBidderUsername().equals(getCurrentWinner(bid.getShoesId())))
+                    success = true;
+                else
+                    success = applyAutomaticBid(bid.getBidderUsername(), bid.getShoesId());;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -158,6 +190,114 @@ public class BidUtil {
         }
 
         return bidHistory;
+    }
+
+    public static boolean setAutoBid(AutoBid bid) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+        boolean success = false;
+
+        try {
+            String query = "INSERT INTO Auto_Bid (shoes_id, bidder_username, bid_increment, bid_maximum) VALUES (?, ?, ?, ?)";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, bid.getShoesId());
+            pstmt.setString(2, bid.getBidderUsername());
+            pstmt.setDouble(3, bid.getBidIncrement());
+            pstmt.setDouble(4, bid.getBidMaximum());
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                if (bid.getBidderUsername().equals(getCurrentWinner(bid.getShoesId())))
+                    success = true;
+                else
+                    success = applyAutomaticBid(null, bid.getShoesId());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return success;
+    }
+
+    public static AutoBid getAutoBid(String username, int shoesId) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try {
+            String query = "SELECT * FROM Auto_Bid WHERE bidder_username = ? AND shoes_id = ? LIMIT 1";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, username);
+            pstmt.setInt(2, shoesId);
+            System.out.println(pstmt.toString());
+            ResultSet result = pstmt.executeQuery();
+
+            if (result.next()) {
+                double bidIncrement = result.getDouble("bid_increment");
+                double bidMaximum = result.getDouble("bid_maximum");
+
+                return new AutoBid(shoesId, username, bidIncrement, bidMaximum);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static boolean applyAutomaticBid(String username, int shoesId) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try {
+            String query = "SELECT * FROM Auto_Bid WHERE shoes_id = ? ";
+            if (username != null) {
+                query += "AND bidder_username <> ? ";
+            }
+            query += " LIMIT 1";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, shoesId);
+            if (username != null) {
+                pstmt.setString(2, username);
+            }
+            ResultSet result = pstmt.executeQuery();
+            if (result.next()) {
+                double bidIncrement = result.getDouble("bid_increment");
+                double bidMaximum = result.getDouble("bid_maximum");
+                double bidAmount = bidIncrement + getHighestBidAmount(shoesId);
+                if (bidAmount <= bidMaximum) {
+                    return placeBid(new Bid(shoesId, result.getString("bidder_username"), LocalDateTime.now(), bidAmount));
+                } else {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
     }
 
 }
