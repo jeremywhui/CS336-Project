@@ -50,30 +50,6 @@
                 background-color: Lightgreen; 
             } 
 		</style>
-
-        <h2>Place a Manual Bid</h2>
-        <form method="POST">
-            <label for="shoes_id">Shoe ID:</label><br>
-			<input type="number" id="shoesId" name="shoesId" step="1" required><br>
-            <label for="bid">Bid:</label><br>
-			<input type="number" id="bid" name="bid" step="0.01" min="0.01" max="9999999999.99" required><br>
-            <br>
-            <input type="submit" name="placeBid" value="Place Bid">
-        </form>
-
-        <%
-            if ("POST".equals(request.getMethod())) {
-                if (request.getParameter("placeBid") != null) {
-                    int shoesId = Integer.parseInt(request.getParameter("shoesId"));
-                    float bid = Float.parseFloat(request.getParameter("bid"));
-                    if (AuctionUtil.validateBidAmount(shoesId, bid)) {
-                        out.println("<p style='color:green'>Bid placed successfully!</p>");
-                    } else {
-                        out.println("<p style='color:red'>Bid could not be placed, please make sure shoesId is correct and the bid is at least the current price + bid increment.</p>");
-                    }
-                } 
-            }
-        %>
         
         <h2>Sort and Search for Shoes:</h2>
         <form method="POST">

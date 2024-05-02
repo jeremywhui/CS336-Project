@@ -1,15 +1,18 @@
 package com.cs336.pkg;
 
-import com.cs336.pkg.models.ShoesAuction;
-import com.cs336.pkg.models.SandalsAuction;
-import com.cs336.pkg.models.SneakersAuction;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.*;
 
 import com.cs336.pkg.models.BootsAuction;
+import com.cs336.pkg.models.SandalsAuction;
+import com.cs336.pkg.models.ShoesAuction;
+import com.cs336.pkg.models.SneakersAuction;
 
 public class AuctionUtil {
     /**
@@ -39,7 +42,7 @@ public class AuctionUtil {
             pstmt1.setTimestamp(8, Timestamp.valueOf(shoesAuction.getDeadline()));
             pstmt1.setDouble(9, shoesAuction.getMinBidIncrement());
             pstmt1.setDouble(10, shoesAuction.getSecretMinPrice());
-            pstmt1.setDouble(11, shoesAuction.getPrice());
+            pstmt1.setDouble(11, shoesAuction.getCurrentPrice());
             pstmt1.executeUpdate();
 
             ResultSet rs = pstmt1.getGeneratedKeys();
@@ -463,59 +466,6 @@ public class AuctionUtil {
         return false;
     }
 
-    public static boolean validateBidAmount(int shoeID, float bid) {
-        ApplicationDB db = new ApplicationDB();
-        Connection con = db.getConnection();
-
-        try (Statement stmt = con.createStatement()) {
-            String query = "SELECT current_price + min_bid_increment minBid FROM Shoes_Auction WHERE shoes_ID = ?";
-            PreparedStatement pstmt = con.prepareStatement(query);
-            pstmt.setInt(1, shoeID);
-            ResultSet result = pstmt.executeQuery();
-            if (result.next()) {
-                return bid >= result.getFloat("minBid");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return false;
-    }
-
-    // public static boolean placeBid(int shoeID, float bid) {
-    // ApplicationDB db = new ApplicationDB();
-    // Connection con = db.getConnection();
-
-    // try (Statement stmt = con.createStatement()) {
-    // String query = "SELECT current_price + min_bid_increment minBid FROM
-    // Shoes_Auction WHERE shoes_ID = ?";
-    // PreparedStatement pstmt = con.prepareStatement(query);
-    // pstmt.setInt(1, shoeID);
-    // ResultSet result = pstmt.executeQuery();
-    // if (result.next()) {
-    // return bid >= result.getFloat("minBid");
-    // }
-    // } catch (SQLException e) {
-    // e.printStackTrace();
-    // } finally {
-    // if (con != null) {
-    // try {
-    // con.close();
-    // } catch (SQLException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    // }
-    // return false;
-    // }
-
     /**
      * Check if a shoes_id exists in the Sale table
      * 
@@ -563,6 +513,131 @@ public class AuctionUtil {
             String query = "SELECT 1 FROM Shoes_Auction WHERE shoes_id = ?";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setInt(1, shoesId);
+            ResultSet result = pstmt.executeQuery();
+            return result.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get all the details of a shoes auction
+     * 
+     * @param shoesId The shoes_id of the shoes auction
+     * @return A ShoesAuction object
+     */
+    public static ShoesAuction getShoesAuction(int shoesId) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+        ShoesAuction shoesAuction = null;
+        // shoesId is a parameter
+        String sellerUsername = null;
+        String name = null;
+        String brand = null;
+        String color = null;
+        String quality = null;
+        float size = 0.0f;
+        char gender = '\0';
+        LocalDateTime deadline = null;
+        double minBidIncrement = 0.0;
+        double secretMinPrice = 0.0;
+        double currentPrice = 0.0;
+        boolean isOpenToed = false;
+        String sport = null;
+        double height = 0.0;
+
+        try {
+            String queryShoes = "SELECT * FROM Shoes_Auction WHERE shoes_id = ?";
+            String querySandals = "SELECT * FROM Sandals_Auction WHERE shoes_id = ?";
+            String querySneakers = "SELECT * FROM Sneakers_Auction WHERE shoes_id = ?";
+            String queryBoots = "SELECT * FROM Boots_Auction WHERE shoes_id = ?";
+
+            PreparedStatement pstmtShoes = con.prepareStatement(queryShoes);
+            PreparedStatement pstmtSandals = con.prepareStatement(querySandals);
+            PreparedStatement pstmtSneakers = con.prepareStatement(querySneakers);
+            PreparedStatement pstmtBoots = con.prepareStatement(queryBoots);
+
+            pstmtShoes.setInt(1, shoesId);
+            pstmtSandals.setInt(1, shoesId);
+            pstmtSneakers.setInt(1, shoesId);
+            pstmtBoots.setInt(1, shoesId);
+
+            ResultSet rsShoes = pstmtShoes.executeQuery();
+            while (rsShoes.next()) {
+                sellerUsername = rsShoes.getString("seller_username");
+                name = rsShoes.getString("name");
+                brand = rsShoes.getString("brand");
+                color = rsShoes.getString("color");
+                quality = rsShoes.getString("quality");
+                size = rsShoes.getFloat("size");
+                gender = rsShoes.getString("gender").charAt(0);
+                deadline = rsShoes.getTimestamp("deadline").toLocalDateTime();
+                minBidIncrement = rsShoes.getDouble("min_bid_increment");
+                secretMinPrice = rsShoes.getDouble("secret_min_price");
+                currentPrice = rsShoes.getDouble("current_price");
+            }
+
+            ResultSet rsSandals = pstmtSandals.executeQuery();
+            ResultSet rsSneakers = pstmtSneakers.executeQuery();
+            ResultSet rsBoots = pstmtBoots.executeQuery();
+
+            boolean isSandals = rsSandals.next();
+            boolean isSneaker = rsSneakers.next();
+            boolean isBoots = rsBoots.next();
+
+            if (isSandals) {
+                isOpenToed = rsSandals.getBoolean("is_open_toed");
+                shoesAuction = new SandalsAuction(shoesId, sellerUsername, name, brand, color, quality, size, gender,
+                        deadline, minBidIncrement, secretMinPrice, currentPrice, isOpenToed);
+                System.out.println("Sandals");
+                return shoesAuction;
+            } else if (isSneaker) {
+                sport = rsSneakers.getString("sport");
+                shoesAuction = new SneakersAuction(shoesId, sellerUsername, name, brand, color, quality, size, gender,
+                        deadline, minBidIncrement, secretMinPrice, currentPrice, sport);
+                System.out.println("Sneakers");
+                return shoesAuction;
+            } else if (isBoots) {
+                height = rsBoots.getDouble("height");
+                shoesAuction = new BootsAuction(shoesId, sellerUsername, name, brand, color, quality, size, gender,
+                        deadline, minBidIncrement, secretMinPrice, currentPrice, height);
+                System.out.println("Boots");
+                return shoesAuction;
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        System.out.println("null");
+        return shoesAuction;
+    }
+
+    /**
+     * Check if this is the username's own shoes auction
+     * 
+     * @param shoesId  The shoes_id of the shoes auction
+     * @param username The username of the user
+     * @return true if the username is the seller of the shoes auction, false
+     *         otherwise
+     */
+    public static boolean isOwnShoesAuction(int shoesId, String username) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try (Statement stmt = con.createStatement()) {
+            String query = "SELECT 1 FROM Shoes_Auction WHERE shoes_id = ? AND seller_username = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, shoesId);
+            pstmt.setString(2, username);
             ResultSet result = pstmt.executeQuery();
             return result.next();
         } catch (SQLException e) {

@@ -138,7 +138,7 @@ public abstract class ShoesAuction {
         return secretMinPrice;
     }
 
-    public double getPrice() {
+    public double getCurrentPrice() {
         return currentPrice;
     }
 

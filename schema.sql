@@ -152,14 +152,14 @@ INSERT IGNORE INTO Sneakers_Auction(shoes_id, sport) VALUES
 (117, 'Tennis');
 
 INSERT IGNORE INTO Bid(shoes_id, bidder_username, time_of_bid, bid_amount) VALUES
-(100, 'user2', NOW(), 101.00),
-(100, 'user3', NOW(), 102.00),
-(101, 'user2', NOW(), 101.00),
-(101, 'user3', NOW(), 102.00),
-(102, 'user1', NOW(), 61.00),
-(102, 'user3', NOW(), 62.00),
-(103, 'user1', NOW(), 61.00),
-(103, 'user2', NOW(), 62.00);
+(100, 'user2', DATE_SUB(NOW(), INTERVAL 8 MINUTE), 101.00),
+(100, 'user3', DATE_SUB(NOW(), INTERVAL 7 MINUTE), 102.00),
+(101, 'user2', DATE_SUB(NOW(), INTERVAL 6 MINUTE), 101.00),
+(101, 'user3', DATE_SUB(NOW(), INTERVAL 5 MINUTE), 102.00),
+(102, 'user1', DATE_SUB(NOW(), INTERVAL 4 MINUTE), 61.00),
+(102, 'user3', DATE_SUB(NOW(), INTERVAL 3 MINUTE), 62.00),
+(103, 'user1', DATE_SUB(NOW(), INTERVAL 2 MINUTE), 61.00),
+(103, 'user2', DATE_SUB(NOW(), INTERVAL 1 MINUTE), 62.00);
 
 INSERT IGNORE INTO Sale(shoes_id, buyer_username) VALUES
 (100, 'user3'),

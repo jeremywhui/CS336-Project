@@ -2,8 +2,14 @@
     pageEncoding="ISO-8859-1" import="com.cs336.pkg.*"%>
 <%@ page import="java.io.*,java.util.*,java.sql.*"%>
 <%@ page import="javax.servlet.http.*,javax.servlet.*" %>
+<%@ page import="com.cs336.pkg.models.ShoesAuction" %>
+<%@ page import="com.cs336.pkg.models.SandalsAuction" %>
+<%@ page import="com.cs336.pkg.models.BootsAuction" %>
+<%@ page import="com.cs336.pkg.models.SneakersAuction" %>
+<%@ page import="com.cs336.pkg.models.Bid" %>
 <%@ page import="java.time.LocalDateTime" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,6 +21,7 @@
             if ((session.getAttribute("username") == null)) { // If user is not logged in, redirect to login page
                 response.sendRedirect("login");
             }
+            String username = (String) session.getAttribute("username");
             String shoesIdParam = request.getParameter("shoesId");
             if (shoesIdParam == null || shoesIdParam.isEmpty()) {
         %>
@@ -32,17 +39,87 @@
                 %>
                         <p>This is not a valid auction.</p>
                 <%
+                    } else if (AuctionUtil.isOwnShoesAuction(shoesId, username)) {
+                %>
+                        <p>You cannot bid on your own auction.</p>
+                <%
                     } else if (AuctionUtil.isSale(shoesId)) {
                 %>
                         <p>This auction has already been sold.</p>
                 <%
                     } else {
-                        // Display the regular auction content
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+                        ShoesAuction shoesAuction = AuctionUtil.getShoesAuction(shoesId);
+                        String sellerUsername = shoesAuction.getSellerUsername();
+                        String name = shoesAuction.getName();
+                        String brand = shoesAuction.getBrand();
+                        String color = shoesAuction.getColor();
+                        String quality = shoesAuction.getQuality();
+                        float size = shoesAuction.getSize();
+                        char gender = shoesAuction.getGender();
+                        String deadline = shoesAuction.getDeadline().format(formatter);
+                        double minBidIncrement = shoesAuction.getMinBidIncrement();
+                        
+                        double currentHighestBid = BidUtil.getHighestBidAmount(shoesId);
+                        double currentMinNextBid = BidUtil.getMinBidAmount(shoesId);
+
+                        ArrayList<Bid> bidHistory = BidUtil.getBidHistory(shoesId);
                 %>
-                        <!-- Rest of your auction content goes here -->
-                <%
+                        <h2>Shoes Details</h2>
+                        <p>Seller Username: <%= sellerUsername %></p>
+                        <p>Name: <%= name %></p>
+                        <p>Brand: <%= brand %></p>
+                        <p>Color: <%= color %></p>
+                        <p>Quality: <%= quality %></p>
+                        <p>Size: <%= size %></p>
+                        <p>Gender: <%= gender %></p>
+                        <p>Deadline: <%= deadline %></p>
+                        <p>Current Highest Bid: <%= currentHighestBid %></p>
+                        <p>Minimum Next Bid: <%= currentMinNextBid %></p>
+
+                        <h2>Bid History</h2>
+                        <table>
+                            <tr>
+                                <th>Bidder Username</th>
+                                <th>Time of Bid</th>
+                                <th>Bid Amount</th>
+                            </tr>
+                            <% for (Bid bid : bidHistory) { %>
+                                <tr>
+                                    <td><%= bid.getBidderUsername() %></td>
+                                    <td><%= bid.getTimeOfBid().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) %></td>
+                                    <td><%= bid.getBidAmount() %></td>
+                                </tr>
+                            <% } %>
+                        </table>
+
+                        <h2>Place a Manual Bid</h2>
+                        <form method="POST">
+                            <label for="bid">Bid:</label><br>
+                            <input type="number" id="bid" name="bid" step="0.01" min="<%= currentMinNextBid %>" max="9999999999.99" required><br>
+                            <br>
+                            <input type="submit" name="placeBid" value="Place Bid">
+                        </form>
+
+                        <%
+                            if ("POST".equals(request.getMethod())) {
+                                if (request.getParameter("placeBid") != null) {
+                                    float bidAmount = Float.parseFloat(request.getParameter("bid"));
+                                    Bid bid = new Bid(shoesId, username, LocalDateTime.now(), bidAmount);
+                                    if (bidAmount >= currentMinNextBid) {
+                                        if(BidUtil.placeBid(bid)) {
+                                            response.sendRedirect("auction?shoesId=" + shoesId);
+                                        } else {
+                                            out.println("<p style='color: red;'>Failed to place bid.</p>");
+                                        }
+                                    } else {
+                                        out.println("<p style='color: red;'>Bid amount must be greater than or equal to the current minimum next bid amount.</p>"); // should never be displayed
+                                    }
+                                } 
+                            }
                     }
                 }
-            %>
+                %>
         </body>
 </html>
