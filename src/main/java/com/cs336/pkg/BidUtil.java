@@ -191,6 +191,62 @@ public class BidUtil {
 
         return bidHistory;
     }
+    
+    public static boolean deleteBid (int shoes_id, String bidder_username, String time) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try {
+            String query = "DELETE FROM Bid WHERE shoes_id = ? AND bidder_username = ? AND time_of_bid = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, shoes_id);
+            pstmt.setString(2, bidder_username);
+            pstmt.setString(3,  time);
+            pstmt.executeUpdate();
+            
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
+    }
+    
+    public static boolean existsInTable (int shoes_id, String bidder_username, String time) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try {
+            String query = "SELECT * FROM Bid WHERE shoes_id = ? AND bidder_username = ? AND time_of_bid = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, shoes_id);
+            pstmt.setString(2, bidder_username);
+            pstmt.setString(3,  time);
+            
+            ResultSet result = pstmt.executeQuery();
+            if (result.next()) {
+            	return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
+    }
 
     public static boolean setAutoBid(AutoBid bid) {
         ApplicationDB db = new ApplicationDB();
