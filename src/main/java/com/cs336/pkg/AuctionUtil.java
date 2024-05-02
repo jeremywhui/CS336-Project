@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import com.cs336.pkg.models.BootsAuction;
@@ -198,7 +199,7 @@ public class AuctionUtil {
      * 
      * @return
      */
-    public static ArrayList<String[]> displayShoesAuction(String sortBy, String ascDesc, String shoeType,
+    public static ArrayList<String[]> displayShoesAuction(String username, String sortBy, String ascDesc, String shoeType,
             String sellerUsername, String name, String brand, String color, String quality, float size, char gender,
             LocalDateTime deadline) {
         ArrayList<String[]> res = new ArrayList<>();
@@ -206,47 +207,30 @@ public class AuctionUtil {
         Connection con = db.getConnection();
 
         try (Statement stmt = con.createStatement()) {
-            boolean firstCondition = true;
-            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, IF(shoes_id IN (SELECT shoes_id FROM sandals_auction), 'Sandals', IF(shoes_id IN (SELECT shoes_id FROM sneakers_auction), 'Sneakers', 'Boots')) AS shoe_type, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) ";
+            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, IF(shoes_id IN (SELECT shoes_id FROM sandals_auction), 'Sandals', IF(shoes_id IN (SELECT shoes_id FROM sneakers_auction), 'Sneakers', 'Boots')) AS shoe_type, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) WHERE seller_username <> ? AND deadline > ? AND shoes_id NOT IN (SELECT shoes_id FROM Sale) ";
             if (!shoeType.equals("")) {
-                query += firstCondition ? "WHERE " : "AND ";
-                query += "shoes_id IN (SELECT shoes_id FROM " + shoeType + "_auction) ";
-                firstCondition = false;
+                query += "AND shoes_id IN (SELECT shoes_id FROM " + shoeType + "_auction) ";
             }
             if (!sellerUsername.equals("")) {
-                query += firstCondition ? "WHERE " : "AND ";
-                query += "seller_username LIKE '%" + sellerUsername + "%' ";
-                firstCondition = false;
+                query += "AND seller_username LIKE '%" + sellerUsername + "%' ";
             }
             if (!name.equals("")) {
-                query += firstCondition ? "WHERE " : "AND ";
-                query += "name LIKE '%" + name + "%' ";
-                firstCondition = false;
+                query += "AND name LIKE '%" + name + "%' ";
             }
             if (!brand.equals("")) {
-                query += firstCondition ? "WHERE " : "AND ";
-                query += "brand LIKE '%" + brand + "%' ";
-                firstCondition = false;
+                query += "AND brand LIKE '%" + brand + "%' ";
             }
             if (!color.equals("")) {
-                query += firstCondition ? "WHERE " : "AND ";
-                query += "color LIKE '%" + color + "%' ";
-                firstCondition = false;
+                query += "AND color LIKE '%" + color + "%' ";
             }
             if (!quality.equals("")) {
-                query += firstCondition ? "WHERE " : "AND ";
-                query += "quality LIKE '%" + quality + "%' ";
-                firstCondition = false;
+                query += "AND quality LIKE '%" + quality + "%' ";
             }
             if (size != -1.0f) {
-                query += firstCondition ? "WHERE " : "AND ";
-                query += "size = " + Float.toString(size) + " ";
-                firstCondition = false;
+                query += "AND size = " + Float.toString(size) + " ";
             }
             if (gender != 'N') {
-                query += firstCondition ? "WHERE " : "AND ";
-                query += "gender = '" + Character.toString(gender) + "' ";
-                firstCondition = false;
+                query += "AND gender = '" + Character.toString(gender) + "' ";
             }
             // if (gender != 'N') {
             // query += firstCondition ? "WHERE " : "AND ";
@@ -267,6 +251,8 @@ public class AuctionUtil {
             query += "ORDER BY " + sortBy + " " + ascDesc;
             System.out.println(query);
             PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, username);
+            pstmt.setString(2, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             ResultSet result = pstmt.executeQuery();
 
             while (result.next()) { // while there are results

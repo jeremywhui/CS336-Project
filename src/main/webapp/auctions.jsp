@@ -15,6 +15,7 @@
             if ((session.getAttribute("username") == null)) { // If user is not logged in, redirect to login page
                 response.sendRedirect("login");
             }
+            String username = (String) session.getAttribute("username");
         %>
         <script>
 		window.onload = function() {
@@ -167,7 +168,7 @@
 					char searchGender = request.getParameter("gender").equals("") ? 'N' : request.getParameter("gender").charAt(0);
 					LocalDateTime searchDeadline = request.getParameter("deadline").equals("") ? null : LocalDateTime.parse(request.getParameter("deadline"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                     
-                    ArrayList<String[]> res = AuctionUtil.displayShoesAuction(sortBy, ascDesc, searchShoeType, searchSellerUsername, searchName, searchBrand, searchColor, searchQuality, searchSize, searchGender, searchDeadline);
+                    ArrayList<String[]> res = AuctionUtil.displayShoesAuction(username, sortBy, ascDesc, searchShoeType, searchSellerUsername, searchName, searchBrand, searchColor, searchQuality, searchSize, searchGender, searchDeadline);
 					if (res != null && res.size() != 0) {
             %>
                         <table>

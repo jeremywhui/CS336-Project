@@ -69,7 +69,7 @@
 			<label for="minBidIncrement">Minimum Bid Increment:</label><br>
 			<input type="number" id="minBidIncrement" name="minBidIncrement" step="0.01" min="0.01" max="9999999999.99" required><br>
 			<label for="secretMinPrice">Secret Minimum Price:</label><br>
-			<input type="number" id="secretMinPrice" name="secretMinPrice" step="0.01" min="0.01" max="9999999999.99" required><br>
+			<input type="number" id="secretMinPrice" name="secretMinPrice" step="0.01" min="0.01" max="9999999999.99"><br>
 			<label for="shoeType">Shoe Type:</label><br>
 			<select id="shoeType" name="shoeType" onchange="showShoeTypeFields(this.value)" required>
 				<option value="">Select a type</option>
@@ -136,7 +136,7 @@
 					char gender = request.getParameter("gender").charAt(0);
 					LocalDateTime deadline = LocalDateTime.parse(request.getParameter("deadline"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 					double minBidIncrement = Double.parseDouble(request.getParameter("minBidIncrement"));
-					double secretMinPrice = Double.parseDouble(request.getParameter("secretMinPrice"));
+					double secretMinPrice = request.getParameter("secretMinPrice").equals("") ? 0.0 : Double.parseDouble(request.getParameter("secretMinPrice"));
 					if(shoeType.equals("sandals")){
 						boolean isOpenToed = Boolean.parseBoolean(request.getParameter("isOpenToed"));
 						shoesAuction = new SandalsAuction(sellerUsername, name, brand, color, quality, size, gender, deadline, minBidIncrement, secretMinPrice, isOpenToed);

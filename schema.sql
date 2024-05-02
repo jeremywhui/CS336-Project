@@ -55,6 +55,16 @@ CREATE TABLE IF NOT EXISTS Bid(
     FOREIGN KEY (bidder_username) REFERENCES End_User (username) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS Auto_Bid(
+    shoes_id INT,
+    bidder_username VARCHAR(100),
+    time_of_bid DATETIME NOT NULL,
+    bid_amount DECIMAL(10, 2) NOT NULL,
+    PRIMARY KEY (shoes_id, bidder_username, time_of_bid),
+    FOREIGN KEY (shoes_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE,
+    FOREIGN KEY (bidder_username) REFERENCES End_User (username) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS Sale(
     shoes_id INT,
     buyer_username VARCHAR(100) NOT NULL,
