@@ -7,12 +7,7 @@ CREATE TABLE IF NOT EXISTS End_User(
     role ENUM('Customer Representative', 'Admin') NULL
 );
 
-INSERT IGNORE INTO End_User(username, password, role)
-VALUES ('test', 'test', NULL),
-       ('admin', 'admin', 'Admin'),
-       ('cr', 'cr', 'Customer Representative');
-
-CREATE TABLE Shoes_Auction(
+CREATE TABLE IF NOT EXISTS Shoes_Auction(
     shoes_id INT AUTO_INCREMENT,
     seller_username VARCHAR(100), 
     name VARCHAR(50) NOT NULL,
@@ -29,37 +24,46 @@ CREATE TABLE Shoes_Auction(
     FOREIGN KEY (seller_username) REFERENCES End_User (username) ON DELETE CASCADE
 );
 
-CREATE TABLE Boots_Auction(
+CREATE TABLE IF NOT EXISTS Boots_Auction(
     shoes_id INT, 
     height FLOAT, 
     PRIMARY KEY (shoes_id), 
     FOREIGN KEY (shoes_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE
 );
 
-CREATE TABLE Sandals_Auction(
+CREATE TABLE IF NOT EXISTS Sandals_Auction(
     shoes_id INT, 
     is_open_toed BOOLEAN,
     PRIMARY KEY(shoes_id),
     FOREIGN KEY(shoes_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE
 );
 
-CREATE TABLE Sneakers_Auction(
+CREATE TABLE IF NOT EXISTS Sneakers_Auction(
     shoes_id INT, 
     sport VARCHAR(20),
     PRIMARY KEY (shoes_id),
     FOREIGN KEY (shoes_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE
 );
-INSERT INTO Shoes_Auction VALUES 
-(1,'test','test','test','blue','New',3,'F','2024-04-29 23:59:00',0.01,20.00,0.00),
-(2,'test','test2','test2','red','New',9,'F','2024-04-30 23:59:00',0.01,20.00,0.00),
-(3,'test','test3','test3','green','Refurbished',10,'M','2024-04-30 19:43:00',0.01,12.00,0.00),
-(4,'test','Expensive Shoes','Expensive Brand','gold','New',10,'U','2024-05-02 23:59:00',5.00,20.00,0.00);
 
-INSERT INTO Boots_Auction VALUES (1,3);
-INSERT INTO Sandals_Auction VALUES (2,0);
-INSERT INTO Sneakers_Auction VALUES (3,'Basketball'),(4,'Tennis');
+CREATE TABLE IF NOT EXISTS Bid(
+    shoes_id INT,
+    bidder_username VARCHAR(100),
+    time_of_bid DATETIME NOT NULL,
+    bid_amount DECIMAL(10, 2) NOT NULL,
+    PRIMARY KEY (shoes_id, bidder_username, time_of_bid),
+    FOREIGN KEY (shoes_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE,
+    FOREIGN KEY (bidder_username) REFERENCES End_User (username) ON DELETE CASCADE
+);
 
-CREATE TABLE Alert(
+CREATE TABLE IF NOT EXISTS Sale(
+    shoes_id INT,
+    buyer_username VARCHAR(100) NOT NULL,
+    PRIMARY KEY (shoes_id),
+    FOREIGN KEY (shoes_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE,
+    FOREIGN KEY (buyer_username) REFERENCES End_User (username) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Alert(
     gender CHAR(1),
     size FLOAT,
     brand VARCHAR(20),
@@ -72,7 +76,7 @@ CREATE TABLE Alert(
     FOREIGN KEY (username) REFERENCES End_User (username) ON DELETE CASCADE
 );
 
-CREATE TABLE Alert_For_S(
+CREATE TABLE IF NOT EXISTS Alert_For_S(
     alert_id INT,
     username VARCHAR(100),
     shoe_id INT,
@@ -90,3 +94,73 @@ CREATE TABLE IF NOT EXISTS Question (
 	PRIMARY KEY (question_id, username),
 	FOREIGN KEY (username) REFERENCES End_User(username) ON DELETE CASCADE
 );
+
+INSERT IGNORE INTO End_User(username, password, role) VALUES 
+('test', 'test', NULL),
+('user1', 'user1', NULL),
+('user2', 'user2', NULL),
+('user3', 'user3', NULL),
+('admin', 'admin', 'Admin'),
+('cr', 'cr', 'Customer Representative');
+
+INSERT IGNORE INTO Shoes_Auction(shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, secret_min_price, current_price) VALUES 
+(100, 'user1','Air Max 90','Nike','Red','New',10,'M','2025-12-31 23:59:00',1.00,100.00,102.00),
+(101, 'user1','Air Max 90','Nike','Black','New',11,'U','2025-12-31 23:59:00',1.00,100.00,102.00), 
+(102, 'user2','Stan Smith','Adidas','White','Used',8,'F','2025-12-31 23:59:00',1.00,60.00,62.00),
+(103, 'user2','Stan Smith','Adidas','White','Used',9,'U','2025-12-31 23:59:00',1.00,60.00,62.00), 
+(104, 'user3','Classic Leather','Reebok','White','Refurbished',10,'M','2023-12-31 23:59:00',1.00,80.00,0.00),
+(105, 'user3','Classic Leather','Reebok','White','New',11,'M','2023-12-31 23:59:00',1.00,80.00,0.00), 
+(106, 'user1','Gel-Lyte III','Asics','Black','New',10,'U','2024-12-31 23:59:00',1.00,110.00,0.00),
+(107, 'user1','Gel-Lyte III','Asics','Black','New',11,'M','2024-12-31 23:59:00',1.00,110.00,0.00), 
+(108, 'user2','Old Skool','Vans','Red','Used',8,'F','2024-12-31 23:59:00',1.00,50.00,0.00),
+(109, 'user2','Old Skool','Vans','Black','Used',9,'F','2024-12-31 23:59:00',1.00,50.00,0.00), 
+(110, 'user3','Suede Classic','Puma','Black','New',10,'M','2025-12-31 23:59:00',1.00,70.00,0.00),
+(111, 'user3','Suede Classic','Puma','Black','New',11,'M','2025-12-31 23:59:00',1.00,70.00,0.00), 
+(112, 'user1','Chuck Taylor All Star','Converse','White','Refurbished',10,'M','2025-12-31 23:59:00',1.00,55.00,0.00),
+(113, 'user1','Chuck Taylor All Star','Converse','White','New',11,'M','2025-12-31 23:59:00',1.00,55.00,0.00),
+(114, 'user2','Authentic','Vans','Black','Used',8,'F','2025-12-31 23:59:00',1.00,45.00,0.00),
+(115, 'user2','Authentic','Vans','Black','Used',9,'F','2024-12-31 23:59:00',1.00,45.00,0.00), 
+(116, 'user3','Clyde','Puma','Red','Refurbished',10,'M','2024-12-31 23:59:00',1.00,75.00,0.00),
+(117, 'user3','Clyde','Puma','White','New',11,'U','2024-12-31 23:59:00',1.00,75.00,0.00),
+(118, 'user1','Superstar','Adidas','White','Refurbished',10,'M','2024-12-31 23:59:00',1.00,65.00,0.00),
+(119, 'user1','Superstar','Adidas','White','New',11,'M','2024-12-31 23:59:00',1.00,65.00,0.00);
+
+INSERT IGNORE INTO Boots_Auction(shoes_id, height) VALUES
+(104, 5),
+(105, 5),
+(110, 8),
+(111, 8),
+(112, 6),
+(113, 6),
+(114, 6),
+(115, 6);
+
+INSERT IGNORE INTO Sandals_Auction(shoes_id, is_open_toed) VALUES
+(102, 0),
+(103, 0),
+(106, 0),
+(107, 0),
+(118, 1),
+(119, 1);
+
+INSERT IGNORE INTO Sneakers_Auction(shoes_id, sport) VALUES
+(100, 'Basketball'),
+(101, 'Basketball'),
+(108, 'Running'),
+(109, 'Running'),
+(116, 'Tennis'),
+(117, 'Tennis');
+
+INSERT IGNORE INTO Bid(shoes_id, bidder_username, time_of_bid, bid_amount) VALUES
+(100, 'user2', NOW(), 101.00),
+(100, 'user3', NOW(), 102.00),
+(101, 'user2', NOW(), 101.00),
+(101, 'user3', NOW(), 102.00),
+(102, 'user1', NOW(), 61.00),
+(102, 'user3', NOW(), 62.00),
+(103, 'user1', NOW(), 61.00),
+(103, 'user2', NOW(), 62.00);
+
+INSERT IGNORE INTO Sale(shoes_id, buyer_username) VALUES
+(100, 'user3'),
+(103, 'user2');
