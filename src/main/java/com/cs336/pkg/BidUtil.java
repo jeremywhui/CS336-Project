@@ -54,9 +54,10 @@ public class BidUtil {
         String winner = null;
 
         try (Statement stmt = con.createStatement()) {
-            String query = "SELECT bidder_username FROM Bid WHERE shoes_id = ? HAVING bid_amount = MAX(bid_amount)";
+            String query = "SELECT bidder_username FROM Bid WHERE shoes_id = ? AND bid_amount = (SELECT MAX(bid_amount) FROM Bid WHERE shoes_id = ?)";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setInt(1, shoesId);
+            pstmt.setInt(2, shoesId);
             ResultSet result = pstmt.executeQuery();
             if (result.next()) {
                 winner = result.getString("bidder_username");
@@ -139,10 +140,7 @@ public class BidUtil {
             pstmt.setDouble(4, bid.getBidAmount());
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                if (bid.getBidderUsername().equals(getCurrentWinner(bid.getShoesId())))
-                    success = true;
-                else
-                    success = applyAutomaticBid(bid.getBidderUsername(), bid.getShoesId());;
+                success = applyAutomaticBid(bid.getBidderUsername(), bid.getShoesId());;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -164,7 +162,7 @@ public class BidUtil {
         Connection con = db.getConnection();
 
         try {
-            String query = "SELECT * FROM Bid WHERE shoes_id = ? ORDER BY time_of_bid DESC";
+            String query = "SELECT * FROM Bid WHERE shoes_id = ? ORDER BY time_of_bid DESC, bid_amount DESC";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setInt(1, shoesId);
             ResultSet result = pstmt.executeQuery();
@@ -329,6 +327,7 @@ public class BidUtil {
             if (username != null) {
                 pstmt.setString(2, username);
             }
+            System.out.println(pstmt.toString());
             ResultSet result = pstmt.executeQuery();
             if (result.next()) {
                 double bidIncrement = result.getDouble("bid_increment");
