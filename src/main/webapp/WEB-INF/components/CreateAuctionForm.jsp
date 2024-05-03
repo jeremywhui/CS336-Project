@@ -7,7 +7,6 @@
 <%@ page import="java.time.LocalDateTime" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.io.*,java.util.*,java.sql.*"%>
-<!-- CreateAuctionForm.jsp -->
 <script>
 window.onload = function() {
     var now = new Date();

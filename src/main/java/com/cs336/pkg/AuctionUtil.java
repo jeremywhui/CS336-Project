@@ -199,7 +199,8 @@ public class AuctionUtil {
      * 
      * @return
      */
-    public static ArrayList<String[]> displayShoesAuction(String username, String sortBy, String ascDesc, String shoeType,
+    public static ArrayList<String[]> displayShoesAuction(String username, String sortBy, String ascDesc,
+            String shoeType,
             String sellerUsername, String name, String brand, String color, String quality, float size, char gender,
             LocalDateTime deadline) {
         ArrayList<String[]> res = new ArrayList<>();
@@ -638,6 +639,94 @@ public class AuctionUtil {
             }
         }
         return false;
+    }
+
+    /**
+     * Updates the shoes auction by checking for auctions that have passed their
+     * deadline and adding a new tuple to the Sale table
+     * if there is a valid bid. A valid bid is a bid that is greater than the secret
+     * minimum price.
+     */
+    public static void updateShoesAuction() {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+        try {
+            con.setAutoCommit(false); // Start transaction
+
+            // Fetch all the shoes auctions that have passed their deadline
+            String auctionQuery = "SELECT * FROM Shoes_Auction WHERE deadline < NOW()";
+            PreparedStatement auctionStmt = con.prepareStatement(auctionQuery);
+            ResultSet auctionResult = auctionStmt.executeQuery();
+
+            while (auctionResult.next()) {
+                int shoesId = auctionResult.getInt("shoes_id");
+                double secretMinPrice = auctionResult.getDouble("secret_min_price");
+
+                // Get the maximum bid_amount for the shoes_id
+                String bidQuery = "SELECT bidder_username, MAX(bid_amount) AS max_bid FROM Bid WHERE shoes_id = ? GROUP BY bidder_username HAVING max_bid > ?";
+                PreparedStatement bidStmt = con.prepareStatement(bidQuery);
+                bidStmt.setInt(1, shoesId);
+                bidStmt.setDouble(2, secretMinPrice);
+                ResultSet bidResult = bidStmt.executeQuery();
+
+                if (bidResult.next()) {
+                    String buyerUsername = bidResult.getString("bidder_username");
+                    double sellPrice = bidResult.getDouble("max_bid");
+
+                    // Add a new tuple to Sale if there is a valid bid
+                    String saleQuery = "INSERT INTO Sale (shoes_id, buyer_username, sell_price) VALUES (?, ?, ?)";
+                    PreparedStatement saleStmt = con.prepareStatement(saleQuery);
+                    saleStmt.setInt(1, shoesId);
+                    saleStmt.setString(2, buyerUsername);
+                    saleStmt.setDouble(3, sellPrice);
+                    saleStmt.executeUpdate();
+                }
+            }
+
+            con.commit(); // Commit the transaction
+        } catch (SQLException e) {
+            try {
+                if (con != null) {
+                    con.rollback(); // Rollback the transaction in case of an error
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * Check if a shoes auction is active. A shoes auction is active if the current
+     * time is before the deadline.
+     * 
+     * @param shoesId The shoes_id of the shoes auction
+     * @return true if the shoes auction is active, false otherwise.
+     */
+    public static boolean isActive(int shoesId) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+        boolean isActive = false;
+        try {
+            String query = "SELECT * FROM Shoes_Auction WHERE shoes_id = ? AND deadline > NOW()";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, shoesId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                isActive = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isActive;
     }
 
 }

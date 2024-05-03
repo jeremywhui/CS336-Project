@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS Auto_Bid(
 CREATE TABLE IF NOT EXISTS Sale(
     shoes_id INT,
     buyer_username VARCHAR(100) NOT NULL,
+    sell_price DECIMAL(10, 2) NOT NULL,
     PRIMARY KEY (shoes_id),
     FOREIGN KEY (shoes_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE,
     FOREIGN KEY (buyer_username) REFERENCES End_User (username) ON DELETE CASCADE
@@ -172,6 +173,6 @@ INSERT IGNORE INTO Bid(shoes_id, bidder_username, time_of_bid, bid_amount) VALUE
 (103, 'user1', DATE_SUB(NOW(), INTERVAL 2 MINUTE), 61.00),
 (103, 'user2', DATE_SUB(NOW(), INTERVAL 1 MINUTE), 62.00);
 
-INSERT IGNORE INTO Sale(shoes_id, buyer_username) VALUES
-(100, 'user3'),
-(103, 'user2');
+INSERT IGNORE INTO Sale(shoes_id, buyer_username, sell_price) VALUES
+(100, 'user3', 102.00),
+(103, 'user2', 62.00);

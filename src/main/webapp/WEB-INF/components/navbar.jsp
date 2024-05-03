@@ -1,4 +1,12 @@
-<!-- navbar.jsp -->
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1" import="com.cs336.pkg.*"%>
+<%@ page import="com.cs336.pkg.models.ShoesAuction" %>
+<%@ page import="com.cs336.pkg.models.SandalsAuction" %>
+<%@ page import="com.cs336.pkg.models.BootsAuction" %>
+<%@ page import="com.cs336.pkg.models.SneakersAuction" %>
+<%@ page import="java.time.LocalDateTime" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="java.io.*,java.util.*,java.sql.*"%>
 <div id="navbar">
     <a href="index">Home</a> |
     <a href="auctions">Auctions</a> |
@@ -21,3 +29,6 @@
         <% } %>
     </span>
 </div>
+<%
+    AuctionUtil.updateShoesAuction();
+%>

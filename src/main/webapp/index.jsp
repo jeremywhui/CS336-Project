@@ -23,6 +23,9 @@
 				// user is an End User
 		%>
 				<jsp:include page="/WEB-INF/components/CreateAuctionForm.jsp" />
+				<jsp:include page="/WEB-INF/components/AuctionsInfo.jsp">
+					<jsp:param name="username" value="<%= username %>" />
+				</jsp:include>
 		<%
 			}
         
