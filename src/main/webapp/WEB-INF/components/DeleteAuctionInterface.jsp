@@ -7,36 +7,28 @@
 <%@ page import="java.time.LocalDateTime" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.io.*,java.util.*,java.sql.*"%>
-<h2>Delete Auction</h2>
-    <form method="post">
-        <h4>Shoes ID Number:</h4>
-        <input type = "number" name = "shoes_id" pattern="\d+" required>
-        <br>
-        <br><input type="submit" name="deleteAuctionSubmit" value="Delete Auction">
-        <br>
-    </form>    
-<%
-    if ("POST".equals(request.getMethod())) {
-        int shoes_id = Integer.parseInt(request.getParameter("shoes_id"));
-        if (!AuctionUtil.existsInTable(shoes_id)){ // Checks shoes_id is a valid shoes_id
-            out.println("<p style='color:red;'>Not a valid Auction</p>");
-        }
-        else if (AuctionUtil.deleteAuction(shoes_id)){ // deletes auction from databse
-            response.sendRedirect("index");
-            out.println("success");
-        }
-        else{
-                out.println("<p style='color:red;'>Error Try again.</p>");
-        }
-    }
-%>
-    <h2>All Auctions</h2>
+<%@ page import="javax.servlet.http.*,javax.servlet.*" %>
+<h2>All Auctions</h2>
 <%
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    if (request.getParameter("deleteAuctionSubmit") != null) {
+        int shoesId = Integer.parseInt(request.getParameter("shoes_id"));
+        boolean isDeleted = AuctionUtil.deleteAuction(shoesId);
+
+        if (isDeleted) {
+            session.setAttribute("message", "<p style='color:green;'>Auction deleted successfully.</p>");
+        } else {
+            session.setAttribute("message", "<p style='color:red;'>Failed to delete auction.</p>");
+        }
+        response.sendRedirect(request.getRequestURI());
+    }
+
     ArrayList<ShoesAuction> auctions = AuctionUtil.showAllAuctions();
     if(auctions.size() == 0){
         out.println("<p>There are no auctions to delete.</p>");
     } else {
+        String message = (String) session.getAttribute("message");
+        session.removeAttribute("message");
 %>
         <table>
             <tr>
@@ -46,6 +38,7 @@
                 <th>Name</th>
                 <th>Brand</th>
                 <th>Deadline</th>
+                <th>Action</th>
             </tr>
             <% for(ShoesAuction auction : auctions) { %>
                 <tr>
@@ -55,11 +48,18 @@
                     <td><%= auction.getName() %></td>
                     <td><%= auction.getBrand() %></td>
                     <td><%= auction.getDeadline().format(formatter) %></td>
+                    <td>
+                        <form method="post">
+                            <input type="hidden" name="shoes_id" value="<%= auction.getShoesId() %>">
+                            <input type="submit" name="deleteAuctionSubmit" value="Delete Auction">
+                        </form>
+                    </td>
                 </tr>
             <% } %>
         </table>
 <%
+        if (message != null) {
+            out.println(message);
+        }
     }
 %>
-
-    			
