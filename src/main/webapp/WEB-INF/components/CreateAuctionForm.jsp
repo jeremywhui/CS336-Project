@@ -7,7 +7,6 @@
 <%@ page import="java.time.LocalDateTime" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.io.*,java.util.*,java.sql.*"%>
-<%@ page import="javax.servlet.http.*,javax.servlet.*" %>
 <!-- CreateAuctionForm.jsp -->
 <script>
 window.onload = function() {
@@ -22,8 +21,6 @@ window.onload = function() {
     document.getElementById('deadline').min = minDateTime;
 }
 </script>
-<h1>Home Page</h1>
-<p>Welcome, <%= session.getAttribute("username")%>!</p>
 <h2>Post Shoes for Sale!</h2>
 <form method="post">
     <label for="name">Name:</label><br>
@@ -111,7 +108,7 @@ window.onload = function() {
             boolean success = false;
             ShoesAuction shoesAuction;
             String shoeType = request.getParameter("shoeType");
-            String sellerUsername = (String) session.getAttribute("username");
+            String sellerUsername = (String)session.getAttribute("username");
             String name = request.getParameter("name");
             String brand = request.getParameter("brand");
             String color = request.getParameter("color");

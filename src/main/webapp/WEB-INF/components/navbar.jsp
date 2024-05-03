@@ -11,8 +11,9 @@
     <% if ("Customer Representative".equals(role)){ %>
     	<a href="customerrep">Customer Rep</a> |
     <% } %>
-    <a href="logout">Logout</a>
+    <a href="logout">Logout</a> |
     <span>
+        <strong><%= session.getAttribute("username") %></strong>
         <% if (role == null) { %>
             (End User)
         <% } else { %>
