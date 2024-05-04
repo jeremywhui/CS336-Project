@@ -98,6 +98,16 @@ CREATE TABLE IF NOT EXISTS Alert_For_S(
     FOREIGN KEY (shoe_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS Alert_For_Auction(
+    time_of_alert DATETIME,
+    username VARCHAR(100),
+    shoes_id INT,
+    is_automatic BOOLEAN NOT NULL,
+    PRIMARY KEY (time_of_alert, username, shoes_id),
+    FOREIGN KEY (username) REFERENCES End_User(username) ON DELETE CASCADE,
+    FOREIGN KEY (shoes_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE
+);
+
        
 CREATE TABLE IF NOT EXISTS Question (
 	question_id INT AUTO_INCREMENT,

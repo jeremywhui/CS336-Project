@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import com.cs336.pkg.models.AuctionAlert;
 import com.cs336.pkg.models.AutoBid;
 import com.cs336.pkg.models.Bid;
 
@@ -75,6 +76,34 @@ public class BidUtil {
         return winner;
     }
 
+    public static boolean winnerIsAutomatic(int shoesId) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+        boolean bidType = false;
+
+        try (Statement stmt = con.createStatement()) {
+            String query = "SELECT is_automatic FROM Bid WHERE shoes_id = ? AND bid_amount = (SELECT MAX(bid_amount) FROM Bid WHERE shoes_id = ?)";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, shoesId);
+            pstmt.setInt(2, shoesId);
+            ResultSet result = pstmt.executeQuery();
+            if (result.next()) {
+                bidType = result.getBoolean("is_automatic");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return bidType;
+    }
+
     /**
      * Get the minimum bid amount for a shoes auction. This is the same as the
      * current price plus the minimum bid increment.
@@ -133,11 +162,16 @@ public class BidUtil {
         try {
             String query = "INSERT INTO Bid (shoes_id, bidder_username, time_of_bid, bid_amount, is_automatic) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement pstmt = con.prepareStatement(query);
-            pstmt.setInt(1, bid.getShoesId());
-            pstmt.setString(2, bid.getBidderUsername());
+            int shoesId = bid.getShoesId();
+            String username = bid.getBidderUsername();
+            pstmt.setInt(1, shoesId);
+            pstmt.setString(2, username);
             pstmt.setTimestamp(3, Timestamp.valueOf(bid.getTimeOfBid()));
             pstmt.setDouble(4, bid.getBidAmount());
             pstmt.setBoolean(5, bid.getIsAutomatic());
+            if (!winnerIsAutomatic(shoesId) && !getCurrentWinner(shoesId).equals(username)) {
+                sendAlert(getCurrentWinner(shoesId), shoesId, false);
+            }
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
                 success = applyAutomaticBid(bid.getBidderUsername(), bid.getShoesId());;
@@ -354,6 +388,71 @@ public class BidUtil {
             }
         }
         return false;
+    }
+
+    public static boolean sendAlert(String username, int shoesId, boolean isAutomatic) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+        boolean success = false;
+
+        try {
+            String query = "INSERT INTO Alert_For_Auction (time_of_alert, username, shoes_id, is_automatic) VALUES (?, ?, ?, ?)";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            pstmt.setString(2, username);
+            pstmt.setInt(3, shoesId);
+            pstmt.setBoolean(4, isAutomatic);
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                success = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return success;
+    }
+
+    public static ArrayList<AuctionAlert> getAlerts(String username) {
+        ArrayList<AuctionAlert> alerts = new ArrayList<>();
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try {
+            String query = "SELECT * FROM Alert_For_Auction WHERE username = ? ORDER BY time_of_alert DESC";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, username);
+            ResultSet result = pstmt.executeQuery();
+
+            while (result.next()) {
+                LocalDateTime timeOfAlert = result.getTimestamp("time_of_alert").toLocalDateTime();
+                String alertUsername = result.getString("username");
+                int shoesId = result.getInt("shoes_id");
+                boolean isAutomatic = result.getBoolean("is_automatic");
+
+                AuctionAlert alert = new AuctionAlert(timeOfAlert, alertUsername, shoesId, isAutomatic);
+                alerts.add(alert);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return alerts;
     }
 
 }

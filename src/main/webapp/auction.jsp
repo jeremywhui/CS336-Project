@@ -96,11 +96,10 @@
                                     <td><%= bid.getBidAmount() %></td>
                                     <td><%= bid.getIsAutomatic() %></td>
                                 </tr>
-                            <% } 
+                            <% } %>
+                        </table>
                             
-                            
-                        if (QuestionUtil.checkUser(username) == 3){ %>
-                        	</table>
+                        <% if (QuestionUtil.checkUser(username) == 3){ %>
                             <h2>Your Automatic Bid (if exists)</h2>
                         <% if (userAutoBid != null) { %>
                         <table>
