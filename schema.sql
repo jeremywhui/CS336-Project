@@ -77,12 +77,12 @@ CREATE TABLE IF NOT EXISTS Sale(
 );
 
 CREATE TABLE IF NOT EXISTS Alert(
-    name VARCHAR(50) NOT NULL,
-    brand VARCHAR(20) NOT NULL,
-    color VARCHAR(20) NOT NULL,
-    quality ENUM('New', 'Used', 'Refurbished') NOT NULL,
-    size FLOAT NOT NULL,
-    gender ENUM('M', 'F', 'U') NOT NULL,
+    name VARCHAR(50),
+    brand VARCHAR(20),
+    color VARCHAR(20),
+    quality ENUM('New', 'Used', 'Refurbished'),
+    size FLOAT,
+    gender ENUM('M', 'F', 'U'),
     height FLOAT, 
     is_open_toed BOOLEAN,
     sport VARCHAR(20),
@@ -94,10 +94,9 @@ CREATE TABLE IF NOT EXISTS Alert(
 
 CREATE TABLE IF NOT EXISTS Alert_For_S(
     alert_id INT,
-    username VARCHAR(100),
     shoe_id INT,
-    PRIMARY KEY (alert_id, username, shoe_id),
-    FOREIGN KEY (alert_id, username) REFERENCES Alert(alert_id, username) ON DELETE CASCADE,
+    PRIMARY KEY (alert_id, shoe_id),
+    FOREIGN KEY (alert_id) REFERENCES Alert(alert_id) ON DELETE CASCADE,
     FOREIGN KEY (shoe_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE
 );
 
