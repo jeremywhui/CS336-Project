@@ -100,7 +100,7 @@
 				<option value="">Select a gender</option>
 				<option value="M">Male</option>
 				<option value="F">Female</option>
-				<option value="U">Unisex</option>
+				<option value="U">Unisex</optifon>
 			</select><br>
 			<label for="deadline">Deadline:</label><br>
 			<input type="datetime-local" id="deadline" name="deadline"><br>

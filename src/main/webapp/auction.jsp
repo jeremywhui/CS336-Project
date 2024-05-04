@@ -99,7 +99,7 @@
                             
                         if (QuestionUtil.checkUser(username) == 3){ %>
                         	</table>
-                            <h2>Your Automatic Bid (if exits)</h2>
+                            <h2>Your Automatic Bid (if exists)</h2>
                         <% if (userAutoBid != null) { %>
                         <table>
                             <tr>
