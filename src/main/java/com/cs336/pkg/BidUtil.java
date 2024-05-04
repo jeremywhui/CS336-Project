@@ -169,8 +169,17 @@ public class BidUtil {
             pstmt.setTimestamp(3, Timestamp.valueOf(bid.getTimeOfBid()));
             pstmt.setDouble(4, bid.getBidAmount());
             pstmt.setBoolean(5, bid.getIsAutomatic());
-            if (!winnerIsAutomatic(shoesId) && !getCurrentWinner(shoesId).equals(username)) {
-                sendAlert(getCurrentWinner(shoesId), shoesId, false);
+            if (!winnerIsAutomatic(shoesId)) {
+                if (!getCurrentWinner(shoesId).equals(username)) {
+                    sendAlert(getCurrentWinner(shoesId), shoesId, false);
+                }
+            }
+            ArrayList<AutoBid> allAutoBids = getAllAutoBids(shoesId);
+            for (AutoBid autoBid : allAutoBids) {
+                if (bid.getBidAmount() > autoBid.getBidMaximum() - autoBid.getBidIncrement()) {
+                    sendAlert(autoBid.getBidderUsername(), shoesId, true);
+                    deleteAutoBid(shoesId, autoBid.getBidderUsername());
+                }
             }
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -225,16 +234,42 @@ public class BidUtil {
         return bidHistory;
     }
     
-    public static boolean deleteBid (int shoes_id, String bidder_username, String time) {
+    public static boolean deleteBid (int shoesId, String bidderUsername, String time) {
         ApplicationDB db = new ApplicationDB();
         Connection con = db.getConnection();
 
         try {
             String query = "DELETE FROM Bid WHERE shoes_id = ? AND bidder_username = ? AND time_of_bid = ?";
             PreparedStatement pstmt = con.prepareStatement(query);
-            pstmt.setInt(1, shoes_id);
-            pstmt.setString(2, bidder_username);
+            pstmt.setInt(1, shoesId);
+            pstmt.setString(2, bidderUsername);
             pstmt.setString(3,  time);
+            pstmt.executeUpdate();
+            
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean deleteAutoBid(int shoesId, String bidderUsername) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try {
+            String query = "DELETE FROM Auto_Bid WHERE shoes_id = ? AND bidder_username = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, shoesId);
+            pstmt.setString(2, bidderUsername);
             pstmt.executeUpdate();
             
             return true;
@@ -345,6 +380,40 @@ public class BidUtil {
         }
 
         return null;
+    }
+
+    public static ArrayList<AutoBid> getAllAutoBids(int shoesId) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        ArrayList<AutoBid> allAutoBids = new ArrayList<>();
+
+        try {
+            String query = "SELECT * FROM Auto_Bid WHERE shoes_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, shoesId);
+            ResultSet result = pstmt.executeQuery();
+
+            while (result.next()) {
+                String username = result.getString("bidder_username");
+                double bidIncrement = result.getDouble("bid_increment");
+                double bidMaximum = result.getDouble("bid_maximum");
+
+                allAutoBids.add(new AutoBid (shoesId, username, bidIncrement, bidMaximum));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return allAutoBids;
     }
 
     public static boolean applyAutomaticBid(String username, int shoesId) {

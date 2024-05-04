@@ -117,7 +117,6 @@ public class AlertUtil {
         try (Statement stmt = con.createStatement()) {
             String query = "DELETE FROM Alerts WHERE alert_id = ?";
             PreparedStatement pstmt = con.prepareStatement(query);
-
             return true;
         } catch (SQLException e) {
             e.printStackTrace();

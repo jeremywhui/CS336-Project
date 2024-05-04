@@ -36,7 +36,7 @@
                 <td><%= alert.getTimeOfAlert().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) %></td>
                     <% int shoesId = alert.getShoesId(); %>
                     <td><a href="auction?shoesId=<%= shoesId %>">Auction #<%= shoesId %></a></td>
-                    <td><%= "A higher bid than your " + (alert.isAutomatic() ?  "automatic" : "manual") + " bid has been placed!"%></td>
+                    <td><%= "A higher bid than your " + (alert.isAutomatic() ?  "automatic" : "manual") + " bid has been placed! " + (alert.isAutomatic() ? "Your automatic bid has been removed." : "")%></td>
                 </tr>
             <% } %>
         </table>
