@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 
 import com.cs336.pkg.models.AutoBid;
@@ -132,12 +131,13 @@ public class BidUtil {
         boolean success = false;
 
         try {
-            String query = "INSERT INTO Bid (shoes_id, bidder_username, time_of_bid, bid_amount) VALUES (?, ?, ?, ?)";
+            String query = "INSERT INTO Bid (shoes_id, bidder_username, time_of_bid, bid_amount, is_automatic) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setInt(1, bid.getShoesId());
             pstmt.setString(2, bid.getBidderUsername());
             pstmt.setTimestamp(3, Timestamp.valueOf(bid.getTimeOfBid()));
             pstmt.setDouble(4, bid.getBidAmount());
+            pstmt.setBoolean(5, bid.getIsAutomatic());
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
                 success = applyAutomaticBid(bid.getBidderUsername(), bid.getShoesId());;
@@ -171,8 +171,9 @@ public class BidUtil {
                 String bidderUsername = result.getString("bidder_username");
                 LocalDateTime timeOfBid = result.getTimestamp("time_of_bid").toLocalDateTime();
                 double bidAmount = result.getDouble("bid_amount");
+                boolean isAutomatic = result.getBoolean("is_automatic");
 
-                Bid bid = new Bid(shoesId, bidderUsername, timeOfBid, bidAmount);
+                Bid bid = new Bid(shoesId, bidderUsername, timeOfBid, bidAmount, isAutomatic);
                 bidHistory.add(bid);
             }
         } catch (SQLException e) {
@@ -334,7 +335,7 @@ public class BidUtil {
                 double bidMaximum = result.getDouble("bid_maximum");
                 double bidAmount = bidIncrement + getHighestBidAmount(shoesId);
                 if (bidAmount <= bidMaximum) {
-                    return placeBid(new Bid(shoesId, result.getString("bidder_username"), LocalDateTime.now(), bidAmount));
+                    return placeBid(new Bid(shoesId, result.getString("bidder_username"), LocalDateTime.now(), bidAmount, true));
                 } else {
                     return true;
                 }

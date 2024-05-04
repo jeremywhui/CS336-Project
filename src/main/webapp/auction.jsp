@@ -87,12 +87,14 @@
                                 <th>Bidder Username</th>
                                 <th>Time of Bid</th>
                                 <th>Bid Amount</th>
+                                <th>Is Automatic</th>
                             </tr>
                             <% for (Bid bid : bidHistory) { %>
                                 <tr>
                                     <td><%= bid.getBidderUsername() %></td>
                                     <td><%= bid.getTimeOfBid().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) %></td>
                                     <td><%= bid.getBidAmount() %></td>
+                                    <td><%= bid.getIsAutomatic() %></td>
                                 </tr>
                             <% } 
                             
@@ -126,7 +128,7 @@
                                 if ("POST".equals(request.getMethod())) {
                                     if (request.getParameter("placeManualBid") != null) {
                                         float bidAmount = Float.parseFloat(request.getParameter("bid"));
-                                        Bid bid = new Bid(shoesId, username, LocalDateTime.now(), bidAmount);
+                                        Bid bid = new Bid(shoesId, username, LocalDateTime.now(), bidAmount, false);
                                         if (bidAmount >= currentMinNextBid) {
                                             if(BidUtil.placeBid(bid)) {
                                                 response.sendRedirect("auction?shoesId=" + shoesId);
