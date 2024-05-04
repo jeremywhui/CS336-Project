@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS Bid(
     bidder_username VARCHAR(100),
     time_of_bid DATETIME NOT NULL,
     bid_amount DECIMAL(10, 2) NOT NULL,
+    is_automatic BOOLEAN NOT NULL,
     PRIMARY KEY (bid_id, shoes_id, bidder_username),
     FOREIGN KEY (shoes_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE,
     FOREIGN KEY (bidder_username) REFERENCES End_User (username) ON DELETE CASCADE

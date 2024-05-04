@@ -7,12 +7,14 @@ public class Bid {
     private String bidderUsername;
     private LocalDateTime timeOfBid;
     private double bidAmount;
+    private boolean isAutomatic;
 
-    public Bid(int shoesId, String bidderUsername, LocalDateTime timeOfBid, double bidAmount) {
+    public Bid(int shoesId, String bidderUsername, LocalDateTime timeOfBid, double bidAmount, boolean isAutomatic) {
         this.shoesId = shoesId;
         this.bidderUsername = bidderUsername;
         this.timeOfBid = timeOfBid;
         this.bidAmount = bidAmount;
+        this.isAutomatic = isAutomatic;
     }
 
     public int getShoesId() {
@@ -31,6 +33,10 @@ public class Bid {
         return bidAmount;
     }
 
+    public boolean getIsAutomatic() {
+        return isAutomatic;
+    }
+
     public void setShoesId(int shoesId) {
         this.shoesId = shoesId;
     }
@@ -45,5 +51,9 @@ public class Bid {
 
     public void setBidAmount(double bidAmount) {
         this.bidAmount = bidAmount;
+    }
+
+    public void setIsAutomatic(boolean isAutomatic) {
+        this.isAutomatic = isAutomatic;
     }
 }
