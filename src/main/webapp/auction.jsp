@@ -100,17 +100,36 @@
                         </table>
                             
                         <% if (QuestionUtil.checkUser(username) == 3){ %>
+                        <%
+                            if (request.getParameter("deleteAutoBidSubmit") != null) {
+                                boolean isDeleted = BidUtil.deleteAutoBid(shoesId, username);
+
+                                if (isDeleted) {
+                                    session.setAttribute("message", "<p style='color:green;'>Automatic bid deleted successfully.</p>");
+                                } else {
+                                    session.setAttribute("message", "<p style='color:red;'>Failed to delete automatic bid.</p>");
+                                }
+                                response.sendRedirect("auction?shoesId="+shoesId);
+                            }
+                        %>
                             <h2>Your Automatic Bid (if exists)</h2>
                         <% if (userAutoBid != null) { %>
                         <table>
                             <tr>
                                 <th>Bid Increment</th>
                                 <th>Bid Maximum</th>
+                                <th>Action</th>
                             </tr>
                             
                                 <tr>
                                     <td><%= userAutoBid.getBidIncrement() %></td>
                                     <td><%= userAutoBid.getBidMaximum() %></td>
+                                    <td>
+                                        <form method="post">
+                                            <input type="hidden" name="shoes_id" value="<%= userAutoBid.getShoesId() %>">
+                                            <input type="submit" name="deleteAutoBidSubmit" value="Delete Automatic Bid">
+                                        </form>
+                                    </td>
                                 </tr>
                         </table>
                          <% } %>
