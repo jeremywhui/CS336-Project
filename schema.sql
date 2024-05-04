@@ -77,15 +77,18 @@ CREATE TABLE IF NOT EXISTS Sale(
 );
 
 CREATE TABLE IF NOT EXISTS Alert(
-    gender CHAR(1),
-    size FLOAT,
-    brand VARCHAR(20),
-    quality VARCHAR(10),
-    name VARCHAR(50),
-    color VARCHAR(20),
+    name VARCHAR(50) NOT NULL,
+    brand VARCHAR(20) NOT NULL,
+    color VARCHAR(20) NOT NULL,
+    quality ENUM('New', 'Used', 'Refurbished') NOT NULL,
+    size FLOAT NOT NULL,
+    gender ENUM('M', 'F', 'U') NOT NULL,
+    height FLOAT, 
+    is_open_toed BOOLEAN,
+    sport VARCHAR(20),
     alert_id INT AUTO_INCREMENT,
-    username VARCHAR(100),
-    PRIMARY KEY (alert_id, username),
+    username VARCHAR(100) NOT NULL,
+    PRIMARY KEY (alert_id),
     FOREIGN KEY (username) REFERENCES End_User (username) ON DELETE CASCADE
 );
 
