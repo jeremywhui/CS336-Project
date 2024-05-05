@@ -10,7 +10,7 @@
 <script>
 window.onload = function() {
     var now = new Date();
-    now.setDate(now.getDate() + 1);
+    now.setDate(now.getDate());
     var year = now.getFullYear();
     var month = (now.getMonth() + 1).toString().padStart(2, '0');
     var day = now.getDate().toString().padStart(2, '0');

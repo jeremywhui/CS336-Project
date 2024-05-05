@@ -6,13 +6,13 @@ public class AuctionAlert {
     private LocalDateTime timeOfAlert;
     private String alertUsername;
     private int shoesId;
-    private boolean isAutomatic;
+    private String text;
 
-    public AuctionAlert(LocalDateTime timeOfAlert, String alertUsername, int shoesId, boolean isAutomatic) {
+    public AuctionAlert(LocalDateTime timeOfAlert, String alertUsername, int shoesId, String text) {
         this.timeOfAlert = timeOfAlert;
         this.alertUsername = alertUsername;
         this.shoesId = shoesId;
-        this.isAutomatic = isAutomatic;
+        this.text = text;
     }
     public LocalDateTime getTimeOfAlert() {
         return timeOfAlert;
@@ -32,10 +32,11 @@ public class AuctionAlert {
     public void setShoesId(int shoesId) {
         this.shoesId = shoesId;
     }
-    public boolean isAutomatic() {
-        return isAutomatic;
+    public String getText() {
+        return text;
     }
-    public void setAutomatic(boolean isAutomatic) {
-        this.isAutomatic = isAutomatic;
+    public void setText(String text) {
+        this.text = text;
     }
+    
 }

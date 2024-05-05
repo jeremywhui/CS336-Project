@@ -161,6 +161,7 @@ public class BidUtil {
 
         int shoesId = bid.getShoesId();
         String username = bid.getBidderUsername();
+        double bidAmount = bid.getBidAmount();
 
         if (AuctionUtil.isActive(bid.getShoesId())) {
             try {
@@ -169,23 +170,24 @@ public class BidUtil {
                 pstmt.setInt(1, shoesId);
                 pstmt.setString(2, username);
                 pstmt.setTimestamp(3, Timestamp.valueOf(bid.getTimeOfBid()));
-                pstmt.setDouble(4, bid.getBidAmount());
+                pstmt.setDouble(4, bidAmount);
                 pstmt.setBoolean(5, bid.getIsAutomatic());
                 if (!winnerIsAutomatic(shoesId)) {
                     if (getCurrentWinner(shoesId) != null && !getCurrentWinner(shoesId).equals(username)) {
-                        sendAlert(getCurrentWinner(shoesId), shoesId, false);
+                        AlertUtil.sendBidAlert(getCurrentWinner(shoesId), shoesId, false);
                     }
                 }
                 ArrayList<AutoBid> allAutoBids = getAllAutoBids(shoesId);
                 for (AutoBid autoBid : allAutoBids) {
                     if (bid.getBidAmount() > autoBid.getBidMaximum() - autoBid.getBidIncrement()) {
-                        sendAlert(autoBid.getBidderUsername(), shoesId, true);
+                        AlertUtil.sendBidAlert(autoBid.getBidderUsername(), shoesId, true);
                         deleteAutoBid(shoesId, autoBid.getBidderUsername());
                     }
                 }
                 int rowsAffected = pstmt.executeUpdate();
                 if (rowsAffected > 0) {
-                    success = applyAutomaticBid(bid.getBidderUsername(), bid.getShoesId());;
+                    updateCurrentPrice(shoesId, bidAmount);
+                    success = applyAutomaticBid(bid.getBidderUsername(), bid.getShoesId());
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -200,6 +202,32 @@ public class BidUtil {
             }
         }
         return success;
+    }
+
+    public static boolean updateCurrentPrice(int shoesId, double newPrice) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try {
+            String query = "UPDATE Shoes_Auction SET current_price = ? WHERE shoes_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setDouble(1, newPrice);
+            pstmt.setInt(2, shoesId);
+            pstmt.executeUpdate();
+            
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
     }
 
     public static ArrayList<Bid> getBidHistory(int shoesId) {
@@ -460,71 +488,6 @@ public class BidUtil {
             }
         }
         return false;
-    }
-
-    public static boolean sendAlert(String username, int shoesId, boolean isAutomatic) {
-        ApplicationDB db = new ApplicationDB();
-        Connection con = db.getConnection();
-        boolean success = false;
-
-        try {
-            String query = "INSERT INTO Alert_For_Auction (time_of_alert, username, shoes_id, is_automatic) VALUES (?, ?, ?, ?)";
-            PreparedStatement pstmt = con.prepareStatement(query);
-            pstmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
-            pstmt.setString(2, username);
-            pstmt.setInt(3, shoesId);
-            pstmt.setBoolean(4, isAutomatic);
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                success = true;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return success;
-    }
-
-    public static ArrayList<AuctionAlert> getAlerts(String username) {
-        ArrayList<AuctionAlert> alerts = new ArrayList<>();
-        ApplicationDB db = new ApplicationDB();
-        Connection con = db.getConnection();
-
-        try {
-            String query = "SELECT * FROM Alert_For_Auction WHERE username = ? ORDER BY time_of_alert DESC";
-            PreparedStatement pstmt = con.prepareStatement(query);
-            pstmt.setString(1, username);
-            ResultSet result = pstmt.executeQuery();
-
-            while (result.next()) {
-                LocalDateTime timeOfAlert = result.getTimestamp("time_of_alert").toLocalDateTime();
-                String alertUsername = result.getString("username");
-                int shoesId = result.getInt("shoes_id");
-                boolean isAutomatic = result.getBoolean("is_automatic");
-
-                AuctionAlert alert = new AuctionAlert(timeOfAlert, alertUsername, shoesId, isAutomatic);
-                alerts.add(alert);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return alerts;
     }
 
 }

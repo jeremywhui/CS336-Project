@@ -22,8 +22,9 @@
         <h1>Alerts Page</h1>
         <p>Welcome, <%= username%>!</p>
 
+        <% AlertUtil.checkWinner(); %>
         <% 
-        ArrayList<AuctionAlert> alerts = BidUtil.getAlerts(username); %>
+        ArrayList<AuctionAlert> alerts = AlertUtil.getAlerts(username); %>
         <h2>Your Alerts for Auctions</h2>
         <table>
             <tr>
@@ -36,7 +37,7 @@
                 <td><%= alert.getTimeOfAlert().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) %></td>
                     <% int shoesId = alert.getShoesId(); %>
                     <td><a href="auction?shoesId=<%= shoesId %>">Auction #<%= shoesId %></a></td>
-                    <td><%= "A higher bid than your " + (alert.isAutomatic() ?  "automatic" : "manual") + " bid has been placed! " + (alert.isAutomatic() ? "Your automatic bid has been removed." : "")%></td>
+                    <td><%=alert.getText()%></td>
                 </tr>
             <% } %>
         </table>
