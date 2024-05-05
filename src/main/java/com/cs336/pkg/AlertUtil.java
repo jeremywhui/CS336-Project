@@ -241,9 +241,8 @@ public class AlertUtil {
             pstmt.setString(8, isOpenToed);
             pstmt.setString(9, sport);
             pstmt.setString(10, username);
-            pstmt.executeUpdate();
-
             int rowsAffected = pstmt.executeUpdate();
+
             System.out.println(rowsAffected);
             if (rowsAffected > 0) {
                 success = true;
