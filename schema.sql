@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS Sale(
     FOREIGN KEY (buyer_username) REFERENCES End_User (username) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Alert(
+CREATE TABLE IF NOT EXISTS Shoe_Preferences(
     name VARCHAR(50),
     brand VARCHAR(20),
     color VARCHAR(20),
@@ -86,18 +86,10 @@ CREATE TABLE IF NOT EXISTS Alert(
     height FLOAT, 
     is_open_toed BOOLEAN,
     sport VARCHAR(20),
-    alert_id INT AUTO_INCREMENT,
+    preference_id INT AUTO_INCREMENT, 
     username VARCHAR(100) NOT NULL,
-    PRIMARY KEY (alert_id),
+    PRIMARY KEY (preference_id),
     FOREIGN KEY (username) REFERENCES End_User (username) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS Alert_For_S(
-    alert_id INT,
-    shoe_id INT,
-    PRIMARY KEY (alert_id, shoe_id),
-    FOREIGN KEY (alert_id) REFERENCES Alert(alert_id) ON DELETE CASCADE,
-    FOREIGN KEY (shoe_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Alert_For_Auction(
@@ -109,7 +101,6 @@ CREATE TABLE IF NOT EXISTS Alert_For_Auction(
     FOREIGN KEY (username) REFERENCES End_User(username) ON DELETE CASCADE,
     FOREIGN KEY (shoes_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE
 );
-
        
 CREATE TABLE IF NOT EXISTS Question (
 	question_id INT AUTO_INCREMENT,

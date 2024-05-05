@@ -93,51 +93,50 @@
             <input type="submit" name="createPreference" value="Create Preference">
         </form>
 
-        <table>
-        <h2>Your Preferences:</h2>
-        <%-- Show table here --%>
+        <script>
+	function showShoeTypeFields(shoeType) {
+		document.getElementById('sandalsFields').style.display = 'none';
+		document.getElementById('sneakersFields').style.display = 'none';
+		document.getElementById('bootsFields').style.display = 'none';
+
+		document.getElementById('isOpenToed').required = false;
+		document.getElementById('sport').required = false;
+		document.getElementById('height').required = false;
+
+		if (shoeType === 'sandals') {
+			document.getElementById('sandalsFields').style.display = 'block';
+		} else if (shoeType === 'sneakers') {
+			document.getElementById('sneakersFields').style.display = 'block';
+		} else if (shoeType === 'boots') {
+			document.getElementById('bootsFields').style.display = 'block';
+		}
+	}
+	</script>
 
         <%
-            char gender;
-            float size;
-            String brand;
-            String quality;
-            String name;
-            String color;
-            boolean isOpenToed;
-            double height;
-            String sport;
-            
+            ArrayList<String[]> res = AlertUtil.getUserPreferences(username);
             // checks if a form was submitted
             if ("POST".equals(request.getMethod())) {
-                if (request.getParameter("name") != null) {
-                    name = request.getParameter("name");
+                if (request.getParameter("createPreference") != null) {
+                    String searchName = request.getParameter("name");
+                    String searchBrand = request.getParameter("brand");
+                    String searchColor = request.getParameter("color");
+                    String searchQuality = request.getParameter("quality");
+                    float searchSize = request.getParameter("size").equals("") ? -1.0f : Float.parseFloat(request.getParameter("size"));
+                    char searchGender = request.getParameter("gender").equals("") ? 'N' : request.getParameter("gender").charAt(0);
+
+                    // checks for shoe type + properties
+                    String isOpenToed = request.getParameter("isOpenToed").equals("") ? null : request.getParameter("isOpenToed");
+                    double height = request.getParameter("height").equals("") ? -1.0: Double.parseDouble(request.getParameter("height"));
+                    String sport = request.getParameter("sport");
+                    AlertUtil.setUserPreferences(username, searchName, searchBrand, searchColor, searchQuality, searchSize, searchGender, isOpenToed, height, sport);
                 }
-                if (request.getParameter("brand") != null) {
-                    brand = request.getParameter("brand");
-                }
-                if (request.getParameter("color") != null) {
-                    color = request.getParameter("color");
-                }
-                if (request.getParameter("quality") != null) {
-                    quality = request.getParameter("quality");
-                }
-                if (request.getParameter("size") != null) {
-                    size = request.getParameter("size");
-                }
-                if (request.getParameter("gender") != null) {
-                    gender = request.getParameter("gender").charAt(0);
-                }
-                
-                // checks for shoe type + propertiess
-                if (request.getParameter("isOpenToed") != null) {
-                    isOpenToed = request.getParameter("isOpenToed");
-                } else if (request.getParameter("sport") != null) {
-                    sport = request.getParameter("sport");
-                } else if (request.getParameter("height") != null) {
-                    height = request.getParameter("height");
-                }
-                %>
+            }
+            %>
+
+                <h2>Your Preferences (if exists)</h2>
+                <% if (res.size() != 0) { %>
+                <table>
                     <tr>
                         <td><h3>Name</h3></td>
                         <td><h3>Brand</h3></td>
@@ -145,33 +144,27 @@
                         <td><h3>Quality</h3></td>
                         <td><h3>Size</h3></td>
                         <td><h3>Gender</h3></td>
-                            <%
-                            if (isOpenToed != null) {
-                                out.println("<td><h3> IsOpenToed </h3></td>");
-                            } else if (sport != null) {
-                                out.println("<td><h3> Sport </h3></td>");
-                            } else if (height != null) {
-                                out.println("<td><h3> Height </h3></td>")
+                        <td><h3>Is Open Toed</h3></td>
+                        <td><h3>Height</h3></td>
+                        <td><h3>Sport</h3></td>
+                    </tr>
+                    <%
+                        for (String[] preference : res) {
+                    %>
+                        <tr>
+                    <%
+                            for (String value : preference) {
+                    %>
+                                    <td><%=value == null ? "Any" : value%></td>
+                    <%
                             }
-                            %>
-                    </tr>
-                    <tr>
-                        <td><%=name%></td>
-                        <td><%=brand%></td>
-                        <td><%=color%></td>
-                        <td><%=quality%></td>
-                        <td><%=size%></td>
-                        <td><%=gender%></td>
-
-                    </tr>
-                <%
-            }
+                    %>
+                        </tr>
+                    <%
+                        }
+                }
         %>
         </table>
-
-        <h2>Your Alerts for Shoes</h2>
-        <%-- Pull same design from auctions.jsp when showing auctions in table --%>
-        <%-- Difference here is you need to add to this table every time a new auction is created --%>
         
     </body>
 </html>

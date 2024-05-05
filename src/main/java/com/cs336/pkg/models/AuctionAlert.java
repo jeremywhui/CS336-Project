@@ -6,7 +6,7 @@ public class AuctionAlert {
     private LocalDateTime timeOfAlert;
     private String alertUsername;
     private int shoesId;
-    private String text;
+private String text;
 
     public AuctionAlert(LocalDateTime timeOfAlert, String alertUsername, int shoesId, String text) {
         this.timeOfAlert = timeOfAlert;

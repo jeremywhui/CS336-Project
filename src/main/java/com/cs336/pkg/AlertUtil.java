@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import com.cs336.pkg.models.Alert;
 import com.cs336.pkg.models.AuctionAlert;
+import com.cs336.pkg.models.BootsAuction;
+import com.cs336.pkg.models.SandalsAuction;
+import com.cs336.pkg.models.SneakersAuction;
 
 /**
  * Utility class for alerts.
@@ -61,55 +64,6 @@ public class AlertUtil {
                 }
             }
         }
-    }
-
-    public static ArrayList<Alert> getAlertsByUsername(String username) {
-        ApplicationDB db = new ApplicationDB();
-        Connection con = db.getConnection();
-        char gender;
-        float size;
-        String brand;
-        String quality;
-        String name;
-        String color;
-        boolean isOpenToed;
-        double height;
-        String sport;
-        ArrayList<Alert> alerts = new ArrayList<>();
-
-        try (Statement stmt = con.createStatement()) {
-            String query = "SELECT * FROM Alerts WHERE username = ?";
-            PreparedStatement pstmt = con.prepareStatement(query);
-            pstmt.setString(1, username);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                gender = rs.getString("gender").charAt(0);
-                size = rs.getFloat("size");
-                brand = rs.getString("brand");
-                quality = rs.getString("quality");
-                name = rs.getString("name");
-                color = rs.getString("color");
-                isOpenToed = rs.getBoolean("isOpenToed");
-                height = rs.getDouble("height");
-                sport = rs.getString("sport");
-
-                alerts.add(new Alert(gender, size, brand, quality, name, color, username, isOpenToed, height, sport));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        
-        return alerts;
     }
 
     public static boolean deleteAlert(Alert alert) {
@@ -266,6 +220,75 @@ public class AlertUtil {
             }
         }
         return success;
+    }
+
+    public static boolean setUserPreferences(String username, String name, String brand, String color, String quality, double size, char gender, String isOpenToed, double height, String sport) {
+        System.out.println("Hi");
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+        boolean success = false;
+
+        try {
+            String query = "INSERT INTO Shoe_Preferences (name, brand, color, quality, size, gender, height, is_open_toed, sport, username) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, name);
+            pstmt.setString(2, brand);
+            pstmt.setString(3, color);
+            pstmt.setString(4, quality);
+            pstmt.setDouble(5, size);
+            pstmt.setString(6, gender == 'N' ? null : String.valueOf(gender));
+            pstmt.setDouble(7, height);
+            pstmt.setString(8, isOpenToed);
+            pstmt.setString(9, sport);
+            pstmt.setString(10, username);
+            pstmt.executeUpdate();
+
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println(rowsAffected);
+            if (rowsAffected > 0) {
+                success = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        return success;        
+    }
+
+    public static ArrayList<String[]> getUserPreferences(String username) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+        ArrayList<String[]> preferences = new ArrayList<>();
+
+        try (Statement stmt = con.createStatement()) {
+            String query = "SELECT * FROM Shoe_Preferences WHERE username = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setString(1, username);
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                preferences.add(new String[] {rs.getString("name"), rs.getString("brand"), rs.getString("color"), rs.getString("quality"), rs.getString("size"), rs.getString("gender"), rs.getString("is_open_toed"), rs.getString("height"), rs.getString("sport")});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return preferences;
     }
 
     
