@@ -208,7 +208,7 @@
                         <% } %>
                         </table>
             		<%
-            		out.println("Revenue from " + itemReportDropdown + " : $" + sum);
+            		out.println("Revenue from " + itemReportText + ": $" + sum);
             		}
             		else{
             			out.println("<p style='color:red;'> There are no items sold that match this description </p>");
@@ -243,7 +243,7 @@
                         <% } %>
                         </table>
             		<%
-            		out.println("Revenue from " + itemReportDropdown + " : $" + sum);
+            		out.println("Revenue from " + itemReportText + ": $" + sum);
             		}
             		else {
             			out.println("<p style='color:red;'> There are no items sold that match this description </p>");
