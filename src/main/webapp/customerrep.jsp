@@ -43,11 +43,6 @@
 					        <td colspan="3" style="border: none;"><input type="submit" name="deleteUser" value="Delete User's Account"></td>
 					    </tr>
 					    <tr>
-					        <td style="border: none; width: 105px;">New Username:</td>
-					        <td style="border: none; width: 95px;"><input type="text" name="newUsername"></td>
-					        <td style="border: none; width: 85px;"><input type="submit" name="changeUser" value="Change Username"></td>
-					    </tr>
-					    <tr>
 					        <td style="border: none; width: 105px;">New Password:</td>
 					        <td style="border: none; width: 95px;"><input type="text" name="newPassword"></td>
 					        <td style="border: none; width: 85px;"><input type="submit" name="changePassword" value="Change Password"></td>

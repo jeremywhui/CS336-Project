@@ -41,7 +41,8 @@
         	<table>
         		<tr>
         			<td> <input type = "submit" name = "generateReports" value = "Generate Total Earnings Reports"></td>
-        			<td> <input type = "submit" name = "bestSellingItemReport" value = "Generate Best Selling Items Report"> 
+        			<td> <input type = "submit" name = "bestSellingItemReport" value = "Generate Best Selling Items Report"></td>
+                    <td> <input type = "submit" name = "bestBuyerReport" value = "Generate Most User Report"></td>
         		</tr>
         		<tr>
         			<td> <select name = "itemReport">
@@ -168,7 +169,33 @@
             		}
            		}
             }
-        
+            else if (request.getParameter("bestBuyerReport") != null){
+                ArrayList<String[]> salesReport= AdminUtil.mostUser();
+                if (!salesReport.isEmpty() && salesReport != null){ %>
+                    <h3> Best Buyer Report </h3>
+                        <table>
+                        <tr>
+                            <td><h3>Buyer</h3></td>
+                            <td><h3>Money Spent</h3></td>
+                        </tr>
+                        <%
+                        double sum = Double.parseDouble(salesReport.get(0)[1]);
+                        for (int i = 0; i < salesReport.size(); i++) {
+                            String [] salesDetails = salesReport.get(i);
+                        %>
+                        <tr>
+                            <td><%=salesDetails[0] %></td>
+                            <td><%=salesDetails[1] %></td>
+                        </tr>
+                        <% } %>
+                        </table>
+                    <%
+                    out.println("Top buyer spent: $" + sum);
+                    }
+                else {
+                    out.println("<p style='color:red;'> No sales so far </p>");
+                }
+            }
             else if (request.getParameter("itemReportSubmit") != null){
             	String itemReportDropdown = request.getParameter("itemReport");
             	String itemReportText = request.getParameter("itemReportText"); %>

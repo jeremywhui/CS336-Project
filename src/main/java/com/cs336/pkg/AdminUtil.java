@@ -1,8 +1,6 @@
 package com.cs336.pkg;
 
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.*;
 
 /**
@@ -460,5 +458,36 @@ public class AdminUtil {
         }
         return itemReport;
     }
+
+    
+    public static ArrayList<String[]> mostUser () {
+        ArrayList<String[]> itemReport = new ArrayList<String[]> ();
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+            try (Statement stmt = con.createStatement()) {
+                String insertQuery = "SELECT buyer_username, SUM(sell_price) AS money_spent FROM sale GROUP BY buyer_username ORDER BY money_spent DESC";
+                PreparedStatement pstmt = con.prepareStatement(insertQuery);
+                ResultSet result = pstmt.executeQuery();
+
+                while (result.next()) { // Move cursor to the first row
+                    String[] item = new String[2];
+                    item[0] = result.getString("buyer_username");
+                    item[1] = result.getString("money_spent");
+                    itemReport.add(item);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if (con != null) {
+                    try {
+                        con.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return itemReport;
+        }
     
 }
