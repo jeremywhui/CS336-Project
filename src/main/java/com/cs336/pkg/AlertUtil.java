@@ -62,7 +62,7 @@ public class AlertUtil {
             }
         }
     }
-    
+
     public static boolean sendBidAlert(String username, int shoesId, boolean isAutomatic) {
         ApplicationDB db = new ApplicationDB();
         Connection con = db.getConnection();
@@ -204,7 +204,7 @@ public class AlertUtil {
         boolean success = false;
 
         try {
-            String query = "INSERT INTO Shoe_Preferences (name, brand, color, quality, size, gender, height, is_open_toed, sport, username) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO Shoe_Preferences (name, brand, color, quality, size, gender, height, is_open_toed, sport, username) VALUES (?, ?, ?, ?, ?, ?, ?, " + isOpenToed + ", ?, ?)";
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setString(1, name);
             pstmt.setString(2, brand);
@@ -213,9 +213,8 @@ public class AlertUtil {
             pstmt.setDouble(5, size);
             pstmt.setString(6, gender == 'N' ? null : String.valueOf(gender));
             pstmt.setDouble(7, height);
-            pstmt.setString(8, isOpenToed);
-            pstmt.setString(9, sport);
-            pstmt.setString(10, username);
+            pstmt.setString(8, sport);
+            pstmt.setString(9, username);
             int rowsAffected = pstmt.executeUpdate();
 
             System.out.println(rowsAffected);

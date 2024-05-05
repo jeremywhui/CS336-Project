@@ -70,8 +70,8 @@ CREATE TABLE IF NOT EXISTS Auto_Bid(
 CREATE TABLE IF NOT EXISTS Sale(
     shoes_id INT,
     buyer_username VARCHAR(100) NOT NULL,
-    sell_price DECIMAL(10, 2) NOT NULL,
-    PRIMARY KEY (shoes_id),
+    sell_price DECIMAL(10, 2),
+    PRIMARY KEY (shoes_id, sell_price),
     FOREIGN KEY (shoes_id) REFERENCES Shoes_Auction (shoes_id) ON DELETE CASCADE,
     FOREIGN KEY (buyer_username) REFERENCES End_User (username) ON DELETE CASCADE
 );
