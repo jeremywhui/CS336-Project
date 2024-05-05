@@ -99,7 +99,10 @@
 	                		}
 	                	}
 	                	else if (request.getParameter("deleteUser") != null){ // if deleteUser form was submitted
-	                		if (AdminUtil.deleteUser(originalUsername)){
+	                		if (originalUsername.equalsIgnoreCase("admin")){
+	                			out.println("<p style='color:red;'> Don't delete the admin!!! </p>");
+	                		}
+	                		else if (AdminUtil.deleteUser(originalUsername)){
 	                			// success
 	                		}
 	                		else{
