@@ -166,40 +166,8 @@
                                         } 
                                 
                                     }
-                        else if (QuestionUtil.checkUser(username) == 2){ %>
-                            <h2>Delete Bid</h2>
-                            <form method="POST">
-                                Fill in the information for the bid you want to delete <br>
-                                Bidder Username: 
-                                <input type = "text" name = "bidder_username" required> <br> 
-                                Bidding Time:
-                                <input type = "text" name = "time" required> <br>
-                                <input type="submit" name="deleteBid" value="Delete Bid">
-                            </form>
-
-                            <%
-                                if ("POST".equals(request.getMethod())) {
-                                    if (request.getParameter("deleteBid") != null) {
-                                        String bidder_username = request.getParameter("bidder_username");
-                                        String bidding_time = request.getParameter("time");
-                                        if (!BidUtil.existsInTable(shoesId, bidder_username, bidding_time)){
-                                            out.println("<p style='color: red;'> Error, inputs not valid </p>");
-                                        }
-                                        else if (BidUtil.deleteBid(shoesId, bidder_username, bidding_time)){
-                                            out.println("bid deleted success");
-                                        }
-                                        else{
-                                            out.println("<p style='color: red;'> Some sort of error happened :( </p>");
-                                        }
-                                    } 
-                            
-                                }
-                        }
-                        else if (QuestionUtil.checkUser(username) == 1){
-                            // admin
-                        }
-                            %>
-                            <h2>Place an Automatic Bid</h2>
+                                    %>
+                                    <h2>Place an Automatic Bid</h2>
                             <form method="POST">
                                 <label for="bid">Bid Increment:</label><br>
                                 <input type="number" id="bidIncrement" name="bidIncrement" step="0.01" min="<%= minBidIncrement %>" max="9999999999.99" required><br>
@@ -225,8 +193,42 @@
                                         }
                                     } 
                                 }
+                        else if (QuestionUtil.checkUser(username) == 1){
+                            // admin
+                        }
                             }
                                 
+                        }
+
+                        if (QuestionUtil.checkUser(username) == 2){ %>
+                            <h2>Delete Bid</h2>
+                            <form method="POST">
+                                Fill in the information for the bid you want to delete <br>
+                                Bidder Username: 
+                                <input type = "text" name = "bidder_username" required> <br> 
+                                Bidding Time:
+                                <input type = "text" name = "time" required> <br>
+                                <input type="submit" name="deleteBid" value="Delete Bid">
+                            </form>
+
+                            <%
+                                if ("POST".equals(request.getMethod())) {
+                                    if (request.getParameter("deleteBid") != null) {
+                                        String bidder_username = request.getParameter("bidder_username");
+                                        String bidding_time = request.getParameter("time");
+                                        if (!BidUtil.existsInTable(shoesId, bidder_username, bidding_time)){
+                                            out.println("<p style='color: red;'> Error, inputs not valid </p>");
+                                        }
+                                        else if (BidUtil.deleteBid(shoesId, bidder_username, bidding_time)){
+                                            out.println("bid deleted success");
+                                        }
+                                        else{
+                                            out.println("<p style='color: red;'> Some sort of error happened :( </p>");
+                                        }
+                                    } 
+                                response.sendRedirect("auction?shoesId=" + shoesId);
+                            
+                                }
                         }
                     }
                  } 
