@@ -375,13 +375,8 @@ public class QuestionUtil {
             while (result.next()) { // while there are results                
                 String question = result.getString("question");
                 String answer = result.getString("answer");
-                int qid = result.getInt("question_id");
 
-                keyValueList.put(question, answer);
-                // if (!question_ids.contains(qid)){
-                //     keyValueList.put(question, answer);
-                //     question_ids.add(qid);
-                // }                
+                keyValueList.put(question, answer);      
             }
 
             String query2 = "SELECT question, answer, question_id from question where question LIKE ?";
@@ -392,30 +387,20 @@ public class QuestionUtil {
             while (result2.next()) { // while there are results
                 String question = result2.getString("question");
                 String answer = result2.getString("answer");
-                int qid = result2.getInt("question_id");
 
                 keyValueList.put(question, answer);
-                // if (!question_ids.contains(qid)) {
-                //     keyValueList.put(question, answer);
-                //     question_ids.add(qid);
-                // }
             }
 
             String query3 = "SELECT question, answer, question_id from question where question LIKE ?";
             PreparedStatement pstmt3 = con.prepareStatement(query3);
-            pstmt3.setString(1, "%" + keyword + "% ");
+            pstmt3.setString(1, "%" + keyword + "%");
             ResultSet result3 = pstmt3.executeQuery();
 
             while (result3.next()) { // while there are results
                 String question = result3.getString("question");
                 String answer = result3.getString("answer");
-                int qid = result3.getInt("question_id");
 
                 keyValueList.put(question, answer);
-                // if (!question_ids.contains(qid)) {
-                //     keyValueList.put(question, answer);
-                //     question_ids.add(qid);
-                // } 
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -5,9 +5,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import com.cs336.pkg.models.Alert;
 import com.cs336.pkg.models.AuctionAlert;
-import com.cs336.pkg.models.BootsAuction;
-import com.cs336.pkg.models.SandalsAuction;
-import com.cs336.pkg.models.SneakersAuction;
 
 /**
  * Utility class for alerts.
@@ -65,29 +62,7 @@ public class AlertUtil {
             }
         }
     }
-
-    public static boolean deleteAlert(Alert alert) {
-        ApplicationDB db = new ApplicationDB();
-        Connection con = db.getConnection();
-
-        try (Statement stmt = con.createStatement()) {
-            String query = "DELETE FROM Alerts WHERE alert_id = ?";
-            PreparedStatement pstmt = con.prepareStatement(query);
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
+    
     public static boolean sendBidAlert(String username, int shoesId, boolean isAutomatic) {
         ApplicationDB db = new ApplicationDB();
         Connection con = db.getConnection();
@@ -274,7 +249,7 @@ public class AlertUtil {
 
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                preferences.add(new String[] {rs.getString("name"), rs.getString("brand"), rs.getString("color"), rs.getString("quality"), rs.getString("size"), rs.getString("gender"), rs.getString("is_open_toed"), rs.getString("height"), rs.getString("sport")});
+                preferences.add(new String[] {rs.getString("name"), rs.getString("brand"), rs.getString("color"), rs.getString("quality"), rs.getString("size"), rs.getString("gender"), rs.getString("is_open_toed") == null ? null : Boolean.toString(rs.getBoolean("is_open_toed")).substring(0, 1).toUpperCase() + Boolean.toString(rs.getBoolean("is_open_toed")).substring(1), rs.getString("height"), rs.getString("sport"), rs.getString("preference_id")});
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -288,6 +263,30 @@ public class AlertUtil {
             }
         }
         return preferences;
+    }
+
+    public static boolean deletePreference(int preference_id) {
+        ApplicationDB db = new ApplicationDB();
+        Connection con = db.getConnection();
+
+        try (Statement stmt = con.createStatement()) {
+            String query = "DELETE FROM Shoe_Preferences WHERE preference_id = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
+            pstmt.setInt(1, preference_id);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
     }
 
     

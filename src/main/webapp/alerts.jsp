@@ -3,6 +3,7 @@
 <%@ page import="java.io.*,java.util.*,java.sql.*"%>
 <%@ page import="javax.servlet.http.*,javax.servlet.*" %>
 <%@ page import="com.cs336.pkg.models.Alert"%>
+<%@ page import="com.cs336.pkg.AlertUtil" %>
 <%@ page import="com.cs336.pkg.models.AuctionAlert" %>
 <%@ page import="java.time.LocalDateTime" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
@@ -22,6 +23,26 @@
         <jsp:include page="/WEB-INF/components/navbar.jsp" />
         <h1>Alerts Page</h1>
         <p>Welcome, <%= username%>!</p>
+
+        <style>
+		    table {
+		        border: 1px solid gray;
+		        border-collapse: collapse;
+		    }
+		    th, td {
+		        width: 250px;
+		        height: 30px;
+		        border: 1px solid gray;
+		        padding: 2px;
+		    }
+		    tr:first-child td{
+		        height: 50px;
+                background-color: Grey
+		    }
+            tr:nth-child(even) { 
+                background-color: #82F5D2; 
+            } 
+		</style>
 
         <% AlertUtil.checkWinner(); %>
         <% 
@@ -121,7 +142,7 @@
                     String searchName = request.getParameter("name");
                     String searchBrand = request.getParameter("brand");
                     String searchColor = request.getParameter("color");
-                    String searchQuality = request.getParameter("quality");
+                    String searchQuality = request.getParameter("quality").equals("") ? null : request.getParameter("quality");
                     float searchSize = request.getParameter("size").equals("") ? -1.0f : Float.parseFloat(request.getParameter("size"));
                     char searchGender = request.getParameter("gender").equals("") ? 'N' : request.getParameter("gender").charAt(0);
 
@@ -130,6 +151,7 @@
                     double height = request.getParameter("height").equals("") ? -1.0: Double.parseDouble(request.getParameter("height"));
                     String sport = request.getParameter("sport");
                     AlertUtil.setUserPreferences(username, searchName, searchBrand, searchColor, searchQuality, searchSize, searchGender, isOpenToed, height, sport);
+                    response.sendRedirect("alerts");
                 }
             }
             %>
@@ -147,22 +169,47 @@
                         <td><h3>Is Open Toed</h3></td>
                         <td><h3>Height</h3></td>
                         <td><h3>Sport</h3></td>
+                        <td><h3>Action</h3></td>
                     </tr>
                     <%
                         for (String[] preference : res) {
                     %>
                         <tr>
                     <%
-                            for (String value : preference) {
+                            for (int i = 0; i < preference.length - 1; i++) {
+                                String value = preference[i];
                     %>
-                                    <td><%=value == null ? "Any" : value%></td>
+                                    <td><%=value == null || value.equals("") || value.equals("-1") ? "Any" : value%></td>
                     <%
                             }
                     %>
+                        <td>
+                            <form method="post">
+                                <input type="hidden" name="preference_id" value="<%= preference[preference.length - 1] %>">
+                                <input type="submit" name="deletePreferenceSubmit" value="Delete Preference">
+                            </form>
+                        </td>
                         </tr>
                     <%
                         }
                 }
+        %>
+
+        <%
+        if ("POST".equals(request.getMethod())) {
+            if (request.getParameter("deletePreferenceSubmit") != null) {
+                int preferenceId = Integer.parseInt(request.getParameter("preference_id"));
+                boolean isDeleted = AlertUtil.deletePreference(preferenceId);
+
+                if (isDeleted) {
+                    session.setAttribute("message", "<p style='color:green;'>Auction deleted successfully.</p>");
+                } else {
+                    session.setAttribute("message", "<p style='color:red;'>Failed to delete auction.</p>");
+                }
+                response.sendRedirect(request.getRequestURI());
+                
+            }
+        }
         %>
         </table>
         

@@ -48,7 +48,7 @@
                 background-color: Grey
 		    }
             tr:nth-child(even) { 
-                background-color: Lightgreen; 
+                background-color: #82F5D2; 
             } 
 		</style>
         
@@ -80,6 +80,11 @@
             <b>Searching (looks if keyword is contained in text columns)</b><br>
 			<label for="viewPastSales">Include Past Sales:</label><br>
 			<select id="viewPastSales" name="viewPastSales">
+				<option value="false">False</option>
+				<option value="true">True</option>
+			</select><br>
+			<label for="viewOwnSales">Include Own Sales:</label><br>
+			<select id="viewOwnSales" name="viewOwnSales">
 				<option value="false">False</option>
 				<option value="true">True</option>
 			</select><br>
@@ -167,6 +172,7 @@
 					String ascDesc = request.getParameter("ascDesc");
 
 					boolean includePastSales = Boolean.parseBoolean(request.getParameter("viewPastSales"));
+					boolean includeOwnSales = Boolean.parseBoolean(request.getParameter("viewOwnSales"));
 					String searchShoeType = request.getParameter("shoeType");
 					String searchSellerUsername = request.getParameter("sellerName");
 					String searchBuyerUsername = request.getParameter("buyerName");
@@ -179,7 +185,7 @@
 					LocalDateTime searchDeadlineFrom = request.getParameter("from").equals("") ? null : LocalDateTime.parse(request.getParameter("from"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 					LocalDateTime searchDeadlineTo = request.getParameter("to").equals("") ? null : LocalDateTime.parse(request.getParameter("to"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                     
-                    ArrayList<String[]> res = AuctionUtil.displayShoesAuction(includePastSales, username, sortBy, ascDesc, searchShoeType, searchSellerUsername, searchBuyerUsername, searchName, searchBrand, searchColor, searchQuality, searchSize, searchGender, searchDeadlineFrom, searchDeadlineTo);
+                    ArrayList<String[]> res = AuctionUtil.displayShoesAuction(includePastSales, includeOwnSales, username, sortBy, ascDesc, searchShoeType, searchSellerUsername, searchBuyerUsername, searchName, searchBrand, searchColor, searchQuality, searchSize, searchGender, searchDeadlineFrom, searchDeadlineTo);
 					if (res != null && res.size() != 0) {
             %>
                         <table>

@@ -57,6 +57,27 @@ public class AuctionUtil {
                     pstmt2.setInt(1, generatedShoesId);
                     pstmt2.setBoolean(2, sandalsAuction.getIsOpenToed());
                     pstmt2.executeUpdate();
+
+                    String query = "SELECT DISTINCT username FROM Shoe_Preferences WHERE (name = '' OR name = ?) AND (brand = '' OR brand = ?) AND (color = '' OR LOWER(color) = LOWER(?)) AND (quality IS NULL OR quality = ?) AND (size = -1 OR size = ?) AND (gender IS NULL OR gender = ?) AND (is_open_toed IS NULL OR is_open_toed = ?) AND username <> ? ";
+                    PreparedStatement pstmt = con.prepareStatement(query);
+                    pstmt.setString(1, sandalsAuction.getName());
+                    pstmt.setString(2, sandalsAuction.getBrand());
+                    pstmt.setString(3, sandalsAuction.getColor());
+                    pstmt.setString(4, sandalsAuction.getQuality());
+                    pstmt.setFloat(5, sandalsAuction.getSize());
+                    pstmt.setString(6, String.valueOf(sandalsAuction.getGender()));
+                    pstmt.setBoolean(7, sandalsAuction.getIsOpenToed());
+                    pstmt.setString(8, shoesAuction.getSellerUsername());
+                    
+                    ResultSet res = pstmt.executeQuery();
+                    while (res.next()) {
+                        String insertQuery = "INSERT IGNORE INTO Alert_For_Auction (time_of_alert, username, shoes_id, text) VALUES (NOW(), ?, ?, ?)";
+                        PreparedStatement insertPstmt = con.prepareStatement(insertQuery);
+                        insertPstmt.setString(1, res.getString("username"));
+                        insertPstmt.setInt(2, generatedShoesId);
+                        insertPstmt.setString(3, "You might be interested in this auction, as it matches at least one of your preferences.");
+                        insertPstmt.executeUpdate();
+                    }
                 } else if (shoesAuction instanceof SneakersAuction) {
                     SneakersAuction sneakersAuction = (SneakersAuction) shoesAuction;
                     String query3 = "INSERT INTO Sneakers_Auction (shoes_id, sport) VALUES (?, ?)";
@@ -64,6 +85,27 @@ public class AuctionUtil {
                     pstmt3.setInt(1, generatedShoesId);
                     pstmt3.setString(2, sneakersAuction.getSport());
                     pstmt3.executeUpdate();
+
+                    String query = "SELECT DISTINCT username FROM Shoe_Preferences WHERE (name = '' OR name = ?) AND (brand = '' OR brand = ?) AND (color = '' OR LOWER(color) = LOWER(?)) AND (quality IS NULL OR quality = ?) AND (size = -1 OR size = ?) AND (gender IS NULL OR gender = ?) AND (sport = '' OR LOWER(sport) = LOWER(?)) AND username <> ?";
+                    PreparedStatement pstmt = con.prepareStatement(query);
+                    pstmt.setString(1, sneakersAuction.getName());
+                    pstmt.setString(2, sneakersAuction.getBrand());
+                    pstmt.setString(3, sneakersAuction.getColor());
+                    pstmt.setString(4, sneakersAuction.getQuality());
+                    pstmt.setFloat(5, sneakersAuction.getSize());
+                    pstmt.setString(6, String.valueOf(sneakersAuction.getGender()));
+                    pstmt.setString(7, sneakersAuction.getSport());
+                    pstmt.setString(8, shoesAuction.getSellerUsername());
+                    
+                    ResultSet res = pstmt.executeQuery();
+                    while (res.next()) {
+                        String insertQuery = "INSERT IGNORE INTO Alert_For_Auction (time_of_alert, username, shoes_id, text) VALUES (NOW(), ?, ?, ?)";
+                        PreparedStatement insertPstmt = con.prepareStatement(insertQuery);
+                        insertPstmt.setString(1, res.getString("username"));
+                        insertPstmt.setInt(2, generatedShoesId);
+                        insertPstmt.setString(3, "You might be interested in this auction, as it matches at least one of your preferences.");
+                        insertPstmt.executeUpdate();
+                    }
                 } else if (shoesAuction instanceof BootsAuction) {
                     BootsAuction bootsAuction = (BootsAuction) shoesAuction;
                     String query4 = "INSERT INTO Boots_Auction (shoes_id, height) VALUES (?, ?)";
@@ -71,6 +113,27 @@ public class AuctionUtil {
                     pstmt4.setInt(1, generatedShoesId);
                     pstmt4.setDouble(2, bootsAuction.getHeight());
                     pstmt4.executeUpdate();
+
+                    String query = "SELECT DISTINCT username FROM Shoe_Preferences WHERE (name = '' OR name = ?) AND (brand = '' OR brand = ?) AND (color = '' OR LOWER(color) = LOWER(?)) AND (quality IS NULL OR quality = ?) AND (size = -1 OR size = ?) AND (gender IS NULL OR gender = ?) AND (height = -1 OR height = ?) AND username <> ?";
+                    PreparedStatement pstmt = con.prepareStatement(query);
+                    pstmt.setString(1, bootsAuction.getName());
+                    pstmt.setString(2, bootsAuction.getBrand());
+                    pstmt.setString(3, bootsAuction.getColor());
+                    pstmt.setString(4, bootsAuction.getQuality());
+                    pstmt.setFloat(5, bootsAuction.getSize());
+                    pstmt.setString(6, String.valueOf(bootsAuction.getGender()));
+                    pstmt.setDouble(7, bootsAuction.getHeight());
+                    pstmt.setString(8, shoesAuction.getSellerUsername());
+                    
+                    ResultSet res = pstmt.executeQuery();
+                    while (res.next()) {
+                        String insertQuery = "INSERT IGNORE INTO Alert_For_Auction (time_of_alert, username, shoes_id, text) VALUES (NOW(), ?, ?, ?)";
+                        PreparedStatement insertPstmt = con.prepareStatement(insertQuery);
+                        insertPstmt.setString(1, res.getString("username"));
+                        insertPstmt.setInt(2, generatedShoesId);
+                        insertPstmt.setString(3, "You might be interested in this auction, as it matches at least one of your preferences.");
+                        insertPstmt.executeUpdate();
+                    }
                 }
             }
 
@@ -199,7 +262,7 @@ public class AuctionUtil {
      * 
      * @return
      */
-    public static ArrayList<String[]> displayShoesAuction(boolean viewPastSales, String username, String sortBy, String ascDesc,
+    public static ArrayList<String[]> displayShoesAuction(boolean viewPastSales, boolean viewOwnSales, String username, String sortBy, String ascDesc,
             String shoeType,
             String sellerUsername, String buyerUsername, String name, String brand, String color, String quality, float size, char gender,
             LocalDateTime deadlineFrom, LocalDateTime deadlineTo) {
@@ -208,7 +271,10 @@ public class AuctionUtil {
         Connection con = db.getConnection();
 
         try (Statement stmt = con.createStatement()) {
-            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, IF(shoes_id IN (SELECT shoes_id FROM sandals_auction), 'Sandals', IF(shoes_id IN (SELECT shoes_id FROM sneakers_auction), 'Sneakers', 'Boots')) AS shoe_type, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) WHERE seller_username <> ? ";
+            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, IF(shoes_id IN (SELECT shoes_id FROM sandals_auction), 'Sandals', IF(shoes_id IN (SELECT shoes_id FROM sneakers_auction), 'Sneakers', 'Boots')) AS shoe_type, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) WHERE TRUE ";
+            if (!viewOwnSales) {
+                query += "AND seller_username <> ? ";
+            }
             if (!viewPastSales) {
                 query += "AND deadline > ? AND shoes_id NOT IN (SELECT shoes_id FROM Sale) ";
             }
@@ -264,9 +330,14 @@ public class AuctionUtil {
             query += "ORDER BY " + sortBy + " " + ascDesc;
             System.out.println(query);
             PreparedStatement pstmt = con.prepareStatement(query);
-            pstmt.setString(1, username);
+            int count = 1;
+            if (!viewOwnSales) {
+                pstmt.setString(count, username);
+                count++;
+            }
             if (!viewPastSales) {
-                pstmt.setString(2, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                pstmt.setString(count, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                count++;
             }
             ResultSet result = pstmt.executeQuery();
 

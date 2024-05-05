@@ -9,7 +9,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import com.cs336.pkg.models.AuctionAlert;
 import com.cs336.pkg.models.AutoBid;
 import com.cs336.pkg.models.Bid;
 
