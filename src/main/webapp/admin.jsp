@@ -294,7 +294,7 @@
             		out.println("Total earnings for "+ user +": $" + sum);
             		}
             		else{
-            			out.println("<p style='color:red;'> Error </p>");
+            			out.println("<p style='color:red;'> User doesn't have any sales </p>");
             		}
             	}
             	else {
