@@ -139,7 +139,10 @@ INSERT IGNORE INTO Shoes_Auction(shoes_id, seller_username, name, brand, color, 
 (116, 'user3','Clyde','Puma','Red','Refurbished',10,'M','2024-12-31 23:59:00',1.00,75.00,0.00),
 (117, 'user3','Clyde','Puma','White','New',11,'U','2024-12-31 23:59:00',1.00,75.00,0.00),
 (118, 'user1','Superstar','Adidas','White','Refurbished',10,'M','2024-12-31 23:59:00',1.00,65.00,0.00),
-(119, 'user1','Superstar','Adidas','White','New',11,'M','2024-12-31 23:59:00',1.00,65.00,0.00);
+(119, 'user1','Superstar','Adidas','White','New',11,'M','2024-12-31 23:59:00',1.00,65.00,0.00),
+(120, 'user1','Stan Smith','Adidas','White','New',11,'M','2024-04-05 23:59:00',1.00,65.00,0.00),
+(121, 'user2','Superstar','Adidas','White','New',11,'M','2024-04-09 23:59:00',1.00,65.00,0.00),
+(122, 'user3','Samba','Adidas','Black','New',11,'M','2024-04-23 23:59:00',1.00,65.00,0.00);
 
 INSERT IGNORE INTO Boots_Auction(shoes_id, height) VALUES
 (104, 5),

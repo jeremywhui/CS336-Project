@@ -184,8 +184,11 @@
 					char searchGender = request.getParameter("gender").equals("") ? 'N' : request.getParameter("gender").charAt(0);
 					LocalDateTime searchDeadlineFrom = request.getParameter("from").equals("") ? null : LocalDateTime.parse(request.getParameter("from"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 					LocalDateTime searchDeadlineTo = request.getParameter("to").equals("") ? null : LocalDateTime.parse(request.getParameter("to"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+					String searchIsOpenToed = request.getParameter("isOpenToed").equals("") ? null : request.getParameter("isOpenToed");
+                    double searchHeight = request.getParameter("height").equals("") ? -1.0: Double.parseDouble(request.getParameter("height"));
+                    String searchSport = request.getParameter("sport");
                     
-                    ArrayList<String[]> res = AuctionUtil.displayShoesAuction(includePastSales, includeOwnSales, username, sortBy, ascDesc, searchShoeType, searchSellerUsername, searchBuyerUsername, searchName, searchBrand, searchColor, searchQuality, searchSize, searchGender, searchDeadlineFrom, searchDeadlineTo);
+                    ArrayList<String[]> res = AuctionUtil.displayShoesAuction(includePastSales, includeOwnSales, username, sortBy, ascDesc, searchShoeType, searchSellerUsername, searchBuyerUsername, searchName, searchBrand, searchColor, searchQuality, searchSize, searchGender, searchDeadlineFrom, searchDeadlineTo, searchIsOpenToed, searchHeight, searchSport);
 					if (res != null && res.size() != 0) {
             %>
                         <table>

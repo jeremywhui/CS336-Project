@@ -265,7 +265,8 @@ public class AuctionUtil {
     public static ArrayList<String[]> displayShoesAuction(boolean viewPastSales, boolean viewOwnSales, String username, String sortBy, String ascDesc,
             String shoeType,
             String sellerUsername, String buyerUsername, String name, String brand, String color, String quality, float size, char gender,
-            LocalDateTime deadlineFrom, LocalDateTime deadlineTo) {
+            LocalDateTime deadlineFrom, LocalDateTime deadlineTo,
+            String isOpenToed, double height, String sport) {
         ArrayList<String[]> res = new ArrayList<>();
         ApplicationDB db = new ApplicationDB();
         Connection con = db.getConnection();
@@ -311,21 +312,15 @@ public class AuctionUtil {
             if (deadlineTo != null) {
                 query += "AND deadline <= '" + deadlineTo.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "' ";
             }
-            // if (gender != 'N') {
-            // query += firstCondition ? "WHERE " : "AND ";
-            // query += "gender = '" + Character.toString(gender) + "' ";
-            // firstCondition = false;
-            // }
-            // if (gender != 'N') {
-            // query += firstCondition ? "WHERE " : "AND ";
-            // query += "gender = '" + Character.toString(gender) + "' ";
-            // firstCondition = false;
-            // }
-            // if (gender != 'N') {
-            // query += firstCondition ? "WHERE " : "AND ";
-            // query += "gender = '" + Character.toString(gender) + "' ";
-            // firstCondition = false;
-            // }
+            if (isOpenToed != null) {
+                query += "And is_open_toed = " + isOpenToed + " ";
+            }
+            if (height != -1.0) {
+                query += "AND height = " + Double.toString(height) + " ";
+            }
+            if (!sport.equals("")) {
+                query += "AND sport LIKE '%" + sport + "%' ";
+            }
 
             query += "ORDER BY " + sortBy + " " + ascDesc;
             System.out.println(query);
