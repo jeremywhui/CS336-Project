@@ -159,40 +159,43 @@ public class BidUtil {
         Connection con = db.getConnection();
         boolean success = false;
 
-        try {
-            String query = "INSERT INTO Bid (shoes_id, bidder_username, time_of_bid, bid_amount, is_automatic) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement pstmt = con.prepareStatement(query);
-            int shoesId = bid.getShoesId();
-            String username = bid.getBidderUsername();
-            pstmt.setInt(1, shoesId);
-            pstmt.setString(2, username);
-            pstmt.setTimestamp(3, Timestamp.valueOf(bid.getTimeOfBid()));
-            pstmt.setDouble(4, bid.getBidAmount());
-            pstmt.setBoolean(5, bid.getIsAutomatic());
-            if (!winnerIsAutomatic(shoesId)) {
-                if (!getCurrentWinner(shoesId).equals(username)) {
-                    sendAlert(getCurrentWinner(shoesId), shoesId, false);
+        int shoesId = bid.getShoesId();
+        String username = bid.getBidderUsername();
+
+        if (AuctionUtil.isActive(bid.getShoesId())) {
+            try {
+                String query = "INSERT INTO Bid (shoes_id, bidder_username, time_of_bid, bid_amount, is_automatic) VALUES (?, ?, ?, ?, ?)";
+                PreparedStatement pstmt = con.prepareStatement(query);
+                pstmt.setInt(1, shoesId);
+                pstmt.setString(2, username);
+                pstmt.setTimestamp(3, Timestamp.valueOf(bid.getTimeOfBid()));
+                pstmt.setDouble(4, bid.getBidAmount());
+                pstmt.setBoolean(5, bid.getIsAutomatic());
+                if (!winnerIsAutomatic(shoesId)) {
+                    if (getCurrentWinner(shoesId) != null && !getCurrentWinner(shoesId).equals(username)) {
+                        sendAlert(getCurrentWinner(shoesId), shoesId, false);
+                    }
                 }
-            }
-            ArrayList<AutoBid> allAutoBids = getAllAutoBids(shoesId);
-            for (AutoBid autoBid : allAutoBids) {
-                if (bid.getBidAmount() > autoBid.getBidMaximum() - autoBid.getBidIncrement()) {
-                    sendAlert(autoBid.getBidderUsername(), shoesId, true);
-                    deleteAutoBid(shoesId, autoBid.getBidderUsername());
+                ArrayList<AutoBid> allAutoBids = getAllAutoBids(shoesId);
+                for (AutoBid autoBid : allAutoBids) {
+                    if (bid.getBidAmount() > autoBid.getBidMaximum() - autoBid.getBidIncrement()) {
+                        sendAlert(autoBid.getBidderUsername(), shoesId, true);
+                        deleteAutoBid(shoesId, autoBid.getBidderUsername());
+                    }
                 }
-            }
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                success = applyAutomaticBid(bid.getBidderUsername(), bid.getShoesId());;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                int rowsAffected = pstmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    success = applyAutomaticBid(bid.getBidderUsername(), bid.getShoesId());;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if (con != null) {
+                    try {
+                        con.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -330,7 +333,7 @@ public class BidUtil {
             pstmt.setDouble(4, bid.getBidMaximum());
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                if (bid.getBidderUsername().equals(getCurrentWinner(bid.getShoesId())))
+                if (getCurrentWinner(bid.getShoesId()) != null && bid.getBidderUsername().equals(getCurrentWinner(bid.getShoesId())))
                     success = true;
                 else
                     success = applyAutomaticBid(null, bid.getShoesId());

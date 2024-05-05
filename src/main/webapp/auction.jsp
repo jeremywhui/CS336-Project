@@ -40,14 +40,6 @@
                 %>
                         <p>This is not a valid auction.</p>
                 <%
-                    } else if (AuctionUtil.isOwnShoesAuction(shoesId, username)) {
-                %>
-                        <p>You cannot bid on your own auction.</p>
-                <%
-                    } else if (AuctionUtil.isSale(shoesId)) {
-                %>
-                        <p>This auction has already been sold.</p>
-                <%
                     } else {
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -112,119 +104,134 @@
                                 response.sendRedirect("auction?shoesId="+shoesId);
                             }
                         %>
-                            <h2>Your Automatic Bid (if exists)</h2>
-                        <% if (userAutoBid != null) { %>
-                        <table>
-                            <tr>
-                                <th>Bid Increment</th>
-                                <th>Bid Maximum</th>
-                                <th>Action</th>
-                            </tr>
-                            
+                    <%
+                    if (AuctionUtil.isOwnShoesAuction(shoesId, username)) {
+                    %>
+                            <b>You cannot bid on your own auction.</b>
+                    <%
+                        } else if (AuctionUtil.isSale(shoesId)) {
+                    %>
+                            <b>This auction has already been sold.</b>
+                    <%
+                        } else if (!AuctionUtil.isActive(shoesId)) {
+                    %>
+                            <b>This auction has already passed.</b>
+                    <%
+                        } else {
+                    %>
+                        <h2>Your Automatic Bid (if exists)</h2>
+                            <% if (userAutoBid != null) { %>
+                            <table>
                                 <tr>
-                                    <td><%= userAutoBid.getBidIncrement() %></td>
-                                    <td><%= userAutoBid.getBidMaximum() %></td>
-                                    <td>
-                                        <form method="post">
-                                            <input type="hidden" name="shoes_id" value="<%= userAutoBid.getShoesId() %>">
-                                            <input type="submit" name="deleteAutoBidSubmit" value="Delete Automatic Bid">
-                                        </form>
-                                    </td>
+                                    <th>Bid Increment</th>
+                                    <th>Bid Maximum</th>
+                                    <th>Action</th>
                                 </tr>
-                        </table>
-                         <% } %>
+                                
+                                    <tr>
+                                        <td><%= userAutoBid.getBidIncrement() %></td>
+                                        <td><%= userAutoBid.getBidMaximum() %></td>
+                                        <td>
+                                            <form method="post">
+                                                <input type="hidden" name="shoes_id" value="<%= userAutoBid.getShoesId() %>">
+                                                <input type="submit" name="deleteAutoBidSubmit" value="Delete Automatic Bid">
+                                            </form>
+                                        </td>
+                                    </tr>
+                            </table>
+                            <% } %>
 
-                        <h2>Place a Manual Bid</h2>
+                            <h2>Place a Manual Bid</h2>
+                                <form method="POST">
+                                    <label for="bid">Bid:</label><br>
+                                    <input type="number" id="bid" name="bid" step="0.01" min="<%= currentMinNextBid %>" max="9999999999.99" required><br>
+                                    <br>
+                                    <input type="submit" name="placeManualBid" value="Place Bid">
+                                </form>
+
+                                <%
+                                    if ("POST".equals(request.getMethod())) {
+                                        if (request.getParameter("placeManualBid") != null) {
+                                            float bidAmount = Float.parseFloat(request.getParameter("bid"));
+                                            Bid bid = new Bid(shoesId, username, LocalDateTime.now(), bidAmount, false);
+                                            if (bidAmount >= currentMinNextBid) {
+                                                if(BidUtil.placeBid(bid)) {
+                                                    response.sendRedirect("auction?shoesId=" + shoesId);
+                                                } else {
+                                                    out.println("<p style='color: red;'>Failed to place bid.</p>");
+                                                }
+                                            } else {
+                                                out.println("<p style='color: red;'>Bid amount must be greater than or equal to the current minimum next bid amount.</p>"); // should never be displayed
+                                            }
+                                        } 
+                                
+                                    }
+                        else if (QuestionUtil.checkUser(username) == 2){ %>
+                            <h2>Delete Bid</h2>
                             <form method="POST">
-                                <label for="bid">Bid:</label><br>
-                                <input type="number" id="bid" name="bid" step="0.01" min="<%= currentMinNextBid %>" max="9999999999.99" required><br>
-                                <br>
-                                <input type="submit" name="placeManualBid" value="Place Bid">
+                                Fill in the information for the bid you want to delete <br>
+                                Bidder Username: 
+                                <input type = "text" name = "bidder_username" required> <br> 
+                                Bidding Time:
+                                <input type = "text" name = "time" required> <br>
+                                <input type="submit" name="deleteBid" value="Delete Bid">
                             </form>
 
                             <%
                                 if ("POST".equals(request.getMethod())) {
-                                    if (request.getParameter("placeManualBid") != null) {
-                                        float bidAmount = Float.parseFloat(request.getParameter("bid"));
-                                        Bid bid = new Bid(shoesId, username, LocalDateTime.now(), bidAmount, false);
-                                        if (bidAmount >= currentMinNextBid) {
-                                            if(BidUtil.placeBid(bid)) {
-                                                response.sendRedirect("auction?shoesId=" + shoesId);
-                                            } else {
-                                                out.println("<p style='color: red;'>Failed to place bid.</p>");
-                                            }
-                                        } else {
-                                            out.println("<p style='color: red;'>Bid amount must be greater than or equal to the current minimum next bid amount.</p>"); // should never be displayed
+                                    if (request.getParameter("deleteBid") != null) {
+                                        String bidder_username = request.getParameter("bidder_username");
+                                        String bidding_time = request.getParameter("time");
+                                        if (!BidUtil.existsInTable(shoesId, bidder_username, bidding_time)){
+                                            out.println("<p style='color: red;'> Error, inputs not valid </p>");
+                                        }
+                                        else if (BidUtil.deleteBid(shoesId, bidder_username, bidding_time)){
+                                            out.println("bid deleted success");
+                                        }
+                                        else{
+                                            out.println("<p style='color: red;'> Some sort of error happened :( </p>");
                                         }
                                     } 
-                        	
-                        		}
-                            }
-                       else if (QuestionUtil.checkUser(username) == 2){ %>
-                    	   </table>
-                           <h2>Delete Bid</h2>
-                           <form method="POST">
-                               Fill in the information for the bid you want to delete <br>
-                               Bidder Username: 
-                               <input type = "text" name = "bidder_username" required> <br> 
-                               Bidding Time:
-                               <input type = "text" name = "time" required> <br>
-                               <input type="submit" name="deleteBid" value="Delete Bid">
-                           </form>
-
-                           <%
-                               if ("POST".equals(request.getMethod())) {
-                                   if (request.getParameter("deleteBid") != null) {
-                                	   String bidder_username = request.getParameter("bidder_username");
-                                	   String bidding_time = request.getParameter("time");
-                                	   if (!BidUtil.existsInTable(shoesId, bidder_username, bidding_time)){
-                                		   out.println("<p style='color: red;'> Error, inputs not valid </p>");
-                                	   }
-                                	   else if (BidUtil.deleteBid(shoesId, bidder_username, bidding_time)){
-                                		   out.println("bid deleted success");
-                                	   }
-                                	   else{
-                                		   out.println("<p style='color: red;'> Some sort of error happened :( </p>");
-                                	   }
-                                   } 
-                       	
-                       		}
-                    	   
-                    	   
-                    	   
-                       }
-                       else if (QuestionUtil.checkUser(username) == 1){
-                    	   // admin
-                       }
-                        %>
-                        <h2>Place an Automatic Bid</h2>
-                        <form method="POST">
-                            <label for="bid">Bid Increment:</label><br>
-                            <input type="number" id="bidIncrement" name="bidIncrement" step="0.01" min="<%= minBidIncrement %>" max="9999999999.99" required><br>
-                            <label for="bid">Bid Maximum:</label><br>
-                            <input type="number" id="bidMaximum" name="bidMaximum" step="0.01" min="<%= currentMinNextBid %>" max="9999999999.99" required><br>
-                            <br>
-                            <input type="submit" name="setAutoBid" value="Set Automatic Bid">
-                        </form>
-                        <%
-                        if ("POST".equals(request.getMethod())) {
-                                if (request.getParameter("setAutoBid") != null) {
-                                    float bidIncrement = Float.parseFloat(request.getParameter("bidIncrement"));
-                                    float bidMaximum = Float.parseFloat(request.getParameter("bidMaximum"));
-                                    AutoBid bid = new AutoBid(shoesId, username, bidIncrement, bidMaximum);
-                                    if (bidIncrement >= minBidIncrement && bidMaximum >= currentMinNextBid) {
-                                        if(BidUtil.setAutoBid(bid)) {
-                                            response.sendRedirect("auction?shoesId=" + shoesId);
+                            
+                                }
+                        }
+                        else if (QuestionUtil.checkUser(username) == 1){
+                            // admin
+                        }
+                            %>
+                            <h2>Place an Automatic Bid</h2>
+                            <form method="POST">
+                                <label for="bid">Bid Increment:</label><br>
+                                <input type="number" id="bidIncrement" name="bidIncrement" step="0.01" min="<%= minBidIncrement %>" max="9999999999.99" required><br>
+                                <label for="bid">Bid Maximum:</label><br>
+                                <input type="number" id="bidMaximum" name="bidMaximum" step="0.01" min="<%= currentMinNextBid %>" max="9999999999.99" required><br>
+                                <br>
+                                <input type="submit" name="setAutoBid" value="Set Automatic Bid">
+                            </form>
+                            <%
+                            if ("POST".equals(request.getMethod())) {
+                                    if (request.getParameter("setAutoBid") != null) {
+                                        float bidIncrement = Float.parseFloat(request.getParameter("bidIncrement"));
+                                        float bidMaximum = Float.parseFloat(request.getParameter("bidMaximum"));
+                                        AutoBid bid = new AutoBid(shoesId, username, bidIncrement, bidMaximum);
+                                        if (bidIncrement >= minBidIncrement && bidMaximum >= currentMinNextBid) {
+                                            if(BidUtil.setAutoBid(bid)) {
+                                                response.sendRedirect("auction?shoesId=" + shoesId);
+                                            } else {
+                                                out.println("<p style='color: red;'>Failed to place automatic bid.</p>");
+                                            }
                                         } else {
-                                            out.println("<p style='color: red;'>Failed to place automatic bid.</p>");
+                                            out.println("<p style='color: red;'>Bid increment must be greater than or equal to the minimum bid increment, and the bid maximum must be greater than or equal to the next bid amount.</p>"); // should never be displayed
                                         }
-                                    } else {
-                                        out.println("<p style='color: red;'>Bid increment must be greater than or equal to the minimum bid increment, and the bid maximum must be greater than or equal to the next bid amount.</p>"); // should never be displayed
-                                    }
-                                } 
+                                    } 
+                                }
                             }
+                                
+                        }
                     }
-                }
+                 } 
                 %>
+                        
+                            
         </body>
 </html>

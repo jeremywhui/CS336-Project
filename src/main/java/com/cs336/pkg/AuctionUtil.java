@@ -199,21 +199,27 @@ public class AuctionUtil {
      * 
      * @return
      */
-    public static ArrayList<String[]> displayShoesAuction(String username, String sortBy, String ascDesc,
+    public static ArrayList<String[]> displayShoesAuction(boolean viewPastSales, String username, String sortBy, String ascDesc,
             String shoeType,
-            String sellerUsername, String name, String brand, String color, String quality, float size, char gender,
-            LocalDateTime deadline) {
+            String sellerUsername, String buyerUsername, String name, String brand, String color, String quality, float size, char gender,
+            LocalDateTime deadlineFrom, LocalDateTime deadlineTo) {
         ArrayList<String[]> res = new ArrayList<>();
         ApplicationDB db = new ApplicationDB();
         Connection con = db.getConnection();
 
         try (Statement stmt = con.createStatement()) {
-            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, IF(shoes_id IN (SELECT shoes_id FROM sandals_auction), 'Sandals', IF(shoes_id IN (SELECT shoes_id FROM sneakers_auction), 'Sneakers', 'Boots')) AS shoe_type, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) WHERE seller_username <> ? AND deadline > ? AND shoes_id NOT IN (SELECT shoes_id FROM Sale) ";
+            String query = "SELECT shoes_id, seller_username, name, brand, color, quality, size, gender, deadline, min_bid_increment, current_price, IF(shoes_id IN (SELECT shoes_id FROM sandals_auction), 'Sandals', IF(shoes_id IN (SELECT shoes_id FROM sneakers_auction), 'Sneakers', 'Boots')) AS shoe_type, height, is_open_toed, sport FROM Shoes_auction LEFT JOIN Boots_Auction USING (shoes_id) LEFT JOIN Sandals_Auction USING (shoes_id) LEFT JOIN Sneakers_Auction USING (shoes_id) WHERE seller_username <> ? ";
+            if (!viewPastSales) {
+                query += "AND deadline > ? AND shoes_id NOT IN (SELECT shoes_id FROM Sale) ";
+            }
             if (!shoeType.equals("")) {
                 query += "AND shoes_id IN (SELECT shoes_id FROM " + shoeType + "_auction) ";
             }
             if (!sellerUsername.equals("")) {
                 query += "AND seller_username LIKE '%" + sellerUsername + "%' ";
+            }
+            if (!buyerUsername.equals("")) {
+                query += "AND shoes_id IN (SELECT shoes_id FROM Bid WHERE bidder_username LIKE '%" + buyerUsername + "%') ";
             }
             if (!name.equals("")) {
                 query += "AND name LIKE '%" + name + "%' ";
@@ -232,6 +238,12 @@ public class AuctionUtil {
             }
             if (gender != 'N') {
                 query += "AND gender = '" + Character.toString(gender) + "' ";
+            }
+            if (deadlineFrom != null) {
+                query += "AND deadline >= '" + deadlineFrom.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "' ";
+            }
+            if (deadlineTo != null) {
+                query += "AND deadline <= '" + deadlineTo.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "' ";
             }
             // if (gender != 'N') {
             // query += firstCondition ? "WHERE " : "AND ";
@@ -253,7 +265,9 @@ public class AuctionUtil {
             System.out.println(query);
             PreparedStatement pstmt = con.prepareStatement(query);
             pstmt.setString(1, username);
-            pstmt.setString(2, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            if (!viewPastSales) {
+                pstmt.setString(2, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            }
             ResultSet result = pstmt.executeQuery();
 
             while (result.next()) { // while there are results

@@ -78,8 +78,15 @@
 			</select><br>
             <br>
             <b>Searching (looks if keyword is contained in text columns)</b><br>
+			<label for="viewPastSales">Include Past Sales:</label><br>
+			<select id="viewPastSales" name="viewPastSales">
+				<option value="false">False</option>
+				<option value="true">True</option>
+			</select><br>
             <label for="sellerName">Seller Name:</label><br>
             <input type="text" id="sellerName" name="sellerName" maxLength="100"><br>
+			<label for="sellerName">Buyer Name:</label><br>
+            <input type="text" id="buyerName" name="buyerName" maxLength="100"><br>
 			<label for="name">Name:</label><br>
 			<input type="text" id="name" name="name" maxlength="50"><br>
 			<label for="brand">Brand:</label><br>
@@ -102,8 +109,9 @@
 				<option value="F">Female</option>
 				<option value="U">Unisex</optifon>
 			</select><br>
-			<label for="deadline">Deadline:</label><br>
-			<input type="datetime-local" id="deadline" name="deadline"><br>
+			<label for="deadline">Deadline Between (leave blank to not specify date limit):</label><br>
+			<input type="datetime-local" id="from" name="from"> to
+			<input type="datetime-local" id="to" name="to"><br>
 			<label for="shoeType">Shoe Type:</label><br>
 			<select id="shoeType" name="shoeType" onchange="showShoeTypeFields(this.value)">
 				<option value="">Select a type</option>
@@ -158,17 +166,20 @@
 					String sortBy = request.getParameter("sortBy");
 					String ascDesc = request.getParameter("ascDesc");
 
+					boolean includePastSales = Boolean.parseBoolean(request.getParameter("viewPastSales"));
 					String searchShoeType = request.getParameter("shoeType");
 					String searchSellerUsername = request.getParameter("sellerName");
+					String searchBuyerUsername = request.getParameter("buyerName");
 					String searchName = request.getParameter("name");
 					String searchBrand = request.getParameter("brand");
 					String searchColor = request.getParameter("color");
 					String searchQuality = request.getParameter("quality");
 					float searchSize = request.getParameter("size").equals("") ? -1.0f : Float.parseFloat(request.getParameter("size"));
 					char searchGender = request.getParameter("gender").equals("") ? 'N' : request.getParameter("gender").charAt(0);
-					LocalDateTime searchDeadline = request.getParameter("deadline").equals("") ? null : LocalDateTime.parse(request.getParameter("deadline"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+					LocalDateTime searchDeadlineFrom = request.getParameter("from").equals("") ? null : LocalDateTime.parse(request.getParameter("from"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+					LocalDateTime searchDeadlineTo = request.getParameter("to").equals("") ? null : LocalDateTime.parse(request.getParameter("to"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                     
-                    ArrayList<String[]> res = AuctionUtil.displayShoesAuction(username, sortBy, ascDesc, searchShoeType, searchSellerUsername, searchName, searchBrand, searchColor, searchQuality, searchSize, searchGender, searchDeadline);
+                    ArrayList<String[]> res = AuctionUtil.displayShoesAuction(includePastSales, username, sortBy, ascDesc, searchShoeType, searchSellerUsername, searchBuyerUsername, searchName, searchBrand, searchColor, searchQuality, searchSize, searchGender, searchDeadlineFrom, searchDeadlineTo);
 					if (res != null && res.size() != 0) {
             %>
                         <table>
